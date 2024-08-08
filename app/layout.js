@@ -16,7 +16,9 @@ export default function RootLayout({ children }) {
         {' '}
         <header className='px-4 lg:px-6 h-14 flex items-center justify-between bg-white drop-shadow-sm'>
           <Link href='/' className='flex items-center' prefetch={false}>
-            <span className='text-lg font-bold'>Matri Mirra Residency</span>
+            <span className='text-lg font-bold text-sky-600 drop-shadow-lg'>
+              Matri Mirra Residency
+            </span>
           </Link>
           <nav className='flex items-center gap-4'>
             <Link
@@ -26,7 +28,7 @@ export default function RootLayout({ children }) {
             >
               Home
             </Link>
-            <Link
+            {/*   <Link
               href='#'
               className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50'
               prefetch={false}
@@ -39,7 +41,7 @@ export default function RootLayout({ children }) {
               prefetch={false}
             >
               Residents
-            </Link>
+            </Link> */}
             <Link
               href='/contact'
               className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50'
