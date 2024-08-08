@@ -14,7 +14,7 @@ export default function Contact() {
             <div className='md:w-1/2 md:pr-4'>
               <div className='mb-4'>
                 <iframe
-                  src='https://maps.app.goo.gl/V6rn9b4JpWbZ8Xi19'
+                  src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1130.5824358528153!2d78.3378910695985!3d17.51307333859742!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb8d6189068901%3A0xd0cf7412e94f7742!2sMatri%20Mirra%20Residency!5e0!3m2!1sen!2sin!4v1723121282986!5m2!1sen!2sin'
                   width='100%'
                   height='450'
                   style={{ border: 0 }}
