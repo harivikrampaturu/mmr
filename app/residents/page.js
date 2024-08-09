@@ -97,25 +97,26 @@ export default function ResidentsList() {
 
   return (
     <div className='p-4'>
-      <h1 className='text-2xl font-bold mb-4'>Residents List</h1>
-
-      {/* Print Button */}
-      <button
-        onClick={() => printList(residents)}
-        className='bg-green-500 text-white py-2 px-4 rounded mb-4'
-      >
-        Print List
-      </button>
-
-      {/* Create Resident Button */}
-      {isAdmin && (
+      <div className='flex justify-between'>
+        {/* Print Button */}
         <button
-          onClick={handleCreate}
-          className='bg-blue-500 text-white py-2 px-4 rounded mb-4'
+          onClick={() => printList(residents)}
+          className='bg-green-500 text-white py-2 px-4 rounded mb-4 size-min'
         >
-          Add New Resident
+          Print
         </button>
-      )}
+        <h1 className='text-2xl font-bold mb-4'>Residents List</h1>
+
+        {/* Create Resident Button */}
+        {isAdmin && (
+          <button
+            onClick={handleCreate}
+            className='bg-blue-500 text-white py-2 px-4 rounded mb-4'
+          >
+            Add New Resident
+          </button>
+        )}
+      </div>
 
       {/* Residents List */}
 

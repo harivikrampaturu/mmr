@@ -45,7 +45,7 @@ const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
   }, [residents]);
 
   return (
-    <div className='overflow-x-auto'>
+    <div className='overflow-x-auto p-16 pt-4'>
       <table className='min-w-full bg-white border border-gray-200 rounded'>
         <thead>
           <tr className='bg-gray-100 border-b'>
