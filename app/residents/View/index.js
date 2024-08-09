@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
-  const [translatedResidents, setTranslatedResidents] = useState([
+  /*   const [translatedResidents, setTranslatedResidents] = useState([
     ...residents
-  ]);
+  ]); */
 
-  useEffect(() => {
+  const translatedResidents = residents || [];
+
+  /*   useEffect(() => {
     const translateText = async (text) => {
       try {
         const response = await fetch(
@@ -43,7 +45,7 @@ const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
 
     translateResidents();
   }, [residents]);
-
+ */
   return (
     <div className='overflow-x-auto p-16 pt-4'>
       <table className='min-w-full bg-white border border-gray-200 rounded'>
@@ -76,25 +78,25 @@ const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
               <td className='py-2 px-4'>
                 <div>{resident.gothram}</div>
                 <div className='text-xs text-gray-500'>
-                  {resident.gothram_telugu}
+                  {resident?.gothram_telugu}
                 </div>
               </td>
               <td className='py-2 px-4'>
                 <div>{resident.familyMembers}</div>
                 <div className='text-xs text-gray-500'>
-                  {resident.familyMembers_telugu}
+                  {resident?.familyMembers_telugu}
                 </div>
               </td>
               <td className='py-2 px-4'>
                 <div>{resident.kids}</div>
                 <div className='text-xs text-gray-500'>
-                  {resident.kids_telugu}
+                  {resident?.kids_telugu}
                 </div>
               </td>
               <td className='py-2 px-4'>
                 <div>{resident.adults}</div>
                 <div className='text-xs text-gray-500'>
-                  {resident.adults_telugu}
+                  {resident?.adults_telugu}
                 </div>
               </td>
               {isAdmin && (
