@@ -68,6 +68,8 @@ const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
               Adults
               <div className='text-xs text-gray-500'>పెద్దలు</div>
             </th>
+            <th className='py-2 px-4 text-left'>Pooja Day</th>
+            <th className='py-2 px-4 text-left'>Contribution</th>
             {isAdmin && <th className='py-2 px-4 text-left'>Actions</th>}
           </tr>
         </thead>
@@ -98,6 +100,12 @@ const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
                 <div className='text-xs text-gray-500'>
                   {resident?.adults_telugu}
                 </div>
+              </td>
+              <td className='py-2 px-4'>
+                <div>{resident?.pooja}</div>
+              </td>
+              <td className='py-2 px-4'>
+                <div>{resident?.contribution}</div>
               </td>
               {isAdmin && (
                 <td className='py-2 px-4 flex space-x-2'>

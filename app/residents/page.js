@@ -16,7 +16,9 @@ export default function ResidentsList() {
     gothram: '',
     familyMembers: '',
     kids: 1,
-    adults: 1
+    adults: 1,
+    pooja: 'Saturday',
+    contribution: 1116
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState('create'); // 'create' or 'edit'
@@ -56,7 +58,9 @@ export default function ResidentsList() {
       gothram: editingResident.gothram,
       familyMembers: editingResident.familyMembers,
       kids: editingResident.kids,
-      adults: editingResident.adults
+      adults: editingResident.adults,
+      pooja: editingResident.pooja,
+      contribution: editingResident.contribution
     };
 
     const response = await fetch('/api/residents', {
@@ -84,6 +88,7 @@ export default function ResidentsList() {
     });
 
     const createdResident = await response.json();
+    debugger;
     setResidents([...residents, createdResident.data]);
     setIsDialogOpen(false);
     setNewResident({
@@ -91,7 +96,9 @@ export default function ResidentsList() {
       gothram: '',
       familyMembers: '',
       kids: 1,
-      adults: 1
+      adults: 1,
+      pooja: 'Saturday',
+      contribution: 1116
     });
   };
 
@@ -198,8 +205,8 @@ export default function ResidentsList() {
                 <textarea
                   value={
                     dialogMode === 'create'
-                      ? newResident.familyMembers
-                      : editingResident.familyMembers
+                      ? newResident?.familyMembers
+                      : editingResident?.familyMembers
                   }
                   onChange={(e) =>
                     dialogMode === 'create'
@@ -221,8 +228,8 @@ export default function ResidentsList() {
                 <select
                   value={
                     dialogMode === 'create'
-                      ? newResident.kids
-                      : editingResident.kids
+                      ? newResident?.kids
+                      : editingResident?.kids
                   }
                   onChange={(e) =>
                     dialogMode === 'create'
@@ -250,8 +257,8 @@ export default function ResidentsList() {
                 <select
                   value={
                     dialogMode === 'create'
-                      ? newResident.adults
-                      : editingResident.adults
+                      ? newResident?.adults
+                      : editingResident?.adults
                   }
                   onChange={(e) =>
                     dialogMode === 'create'
@@ -273,6 +280,54 @@ export default function ResidentsList() {
                     </option>
                   ))}
                 </select>
+              </div>
+              <div className='mb-4'>
+                <label className='block mb-1 font-medium'>Pooja:</label>
+                <input
+                  type='text'
+                  value={
+                    dialogMode === 'create'
+                      ? newResident?.pooja
+                      : editingResident?.pooja
+                  }
+                  onChange={(e) =>
+                    dialogMode === 'create'
+                      ? setNewResident({
+                          ...newResident,
+                          pooja: e.target.value
+                        })
+                      : setEditingResident({
+                          ...editingResident,
+                          pooja: e.target.value
+                        })
+                  }
+                  className='border border-gray-300 rounded p-2 w-full'
+                  required
+                />
+              </div>
+              <div className='mb-4'>
+                <label className='block mb-1 font-medium'>Contribution:</label>
+                <input
+                  type='text'
+                  value={
+                    dialogMode === 'create'
+                      ? newResident?.contribution
+                      : editingResident?.contribution
+                  }
+                  onChange={(e) =>
+                    dialogMode === 'create'
+                      ? setNewResident({
+                          ...newResident,
+                          contribution: parseInt(e.target.value)
+                        })
+                      : setEditingResident({
+                          ...editingResident,
+                          contribution: parseInt(e.target.value)
+                        })
+                  }
+                  className='border border-gray-300 rounded p-2 w-full'
+                  required
+                />
               </div>
               <div className='flex justify-end'>
                 <button

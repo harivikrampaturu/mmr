@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
         <header className='px-4 lg:px-6 h-14 flex items-center justify-between bg-white drop-shadow-sm'>
           <Link href='/' className='flex items-center' prefetch={false}>
             <span className='text-lg font-bold text-sky-600 drop-shadow-lg'>
-              Matri Mirra Residency
+              {/* Matri Mirra Residency */}
             </span>
           </Link>
           <nav className='flex items-center gap-4'>
