@@ -1,0 +1,40 @@
+/* ============================================================================================================= */
+/* PRO DISPLAY */
+/* ============================================================================================================= */
+
+@font-face {
+  font-family: "SF_BOLD";
+  src: url("./sf-pro-display_bold.woff2") format("woff2");
+  font-display: swap;
+  /* Additional font-face properties like font-weight, font-style, etc. can be added here */
+}
+
+@font-face {
+  font-family: "SF_REGULAR";
+  src: url("./sf-pro-display_regular.woff2") format("woff2");
+  font-display: swap;
+  /* Additional font-face properties like font-weight, font-style, etc. can be added here */
+}
+
+@font-face {
+  font-family: "SF_SEMI_BOLD";
+  src: url("./sf-pro-display_semibold.woff2") format("woff2");
+  font-display: swap;
+  /* Additional font-face properties like font-weight, font-style, etc. can be added here */
+}
+
+@font-face {
+  font-family: 'GENERAL_SANS';
+  src: url("./GeneralSans-Variable.ttf") format('truetype');
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SATOSHI_SANS';
+  src: url("./Satoshi-Variable.ttf") format('truetype');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
