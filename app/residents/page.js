@@ -30,13 +30,15 @@ export default function ResidentsList() {
   }, []);
 
   const handleDelete = async (id) => {
-    await fetch('/api/residents', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id })
-    });
+    if (confirm('Press ok to delete') === true) {
+      await fetch('/api/residents', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
 
-    setResidents(residents.filter((resident) => resident._id !== id));
+      setResidents(residents.filter((resident) => resident._id !== id));
+    }
   };
 
   const handleEdit = (resident) => {
@@ -118,7 +120,7 @@ export default function ResidentsList() {
         {isAdmin && (
           <button
             onClick={handleCreate}
-            className='bg-blue-500 text-white py-2 px-4 rounded mb-4'
+            className='bg-blue text-white py-2 px-4 rounded mb-4'
           >
             Add New Resident
           </button>
@@ -140,8 +142,8 @@ export default function ResidentsList() {
           className='fixed inset-0 bg-black bg-opacity-30'
           aria-hidden='true'
         />
-        <div className='fixed inset-0 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-lg p-6 w-full max-w-md'>
+        <div className='fixed inset-0 flex items-center justify-center p-4 overflow-y-auto  '>
+          <div className='bg-white rounded-lg p-6 w-full max-w-lg '>
             <Dialog.Title className='text-2xl font-semibold mb-4'>
               {dialogMode === 'create' ? 'Add New Resident' : 'Edit Resident'}
             </Dialog.Title>
@@ -150,198 +152,212 @@ export default function ResidentsList() {
                 dialogMode === 'create' ? handleCreateSubmit : handleUpdate
               }
             >
-              <div className='mb-4'>
-                <label className='block mb-1 font-medium'>Flat No:</label>
-                <input
-                  type='text'
-                  value={
-                    dialogMode === 'create'
-                      ? newResident?.flatNo
-                      : editingResident?.flatNo
-                  }
-                  onChange={(e) =>
-                    dialogMode === 'create'
-                      ? setNewResident({
-                          ...newResident,
-                          flatNo: e.target.value
-                        })
-                      : setEditingResident({
-                          ...editingResident,
-                          flatNo: e.target.value
-                        })
-                  }
-                  className='border border-gray-300 rounded p-2 w-full'
-                  required
-                />
+              <div className='flex flex-row justify-between'>
+                <div className='mr-4'>
+                  <div className='mb-4'>
+                    <label className='block mb-1 font-medium'>Flat No:</label>
+                    <input
+                      type='text'
+                      value={
+                        dialogMode === 'create'
+                          ? newResident?.flatNo
+                          : editingResident?.flatNo
+                      }
+                      onChange={(e) =>
+                        dialogMode === 'create'
+                          ? setNewResident({
+                              ...newResident,
+                              flatNo: e.target.value
+                            })
+                          : setEditingResident({
+                              ...editingResident,
+                              flatNo: e.target.value
+                            })
+                      }
+                      className='border border-gray-300 rounded p-2 w-full'
+                      required
+                    />
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block mb-1 font-medium'>Gothram:</label>
+                    <input
+                      type='text'
+                      value={
+                        dialogMode === 'create'
+                          ? newResident?.gothram
+                          : editingResident?.gothram
+                      }
+                      onChange={(e) =>
+                        dialogMode === 'create'
+                          ? setNewResident({
+                              ...newResident,
+                              gothram: e.target.value
+                            })
+                          : setEditingResident({
+                              ...editingResident,
+                              gothram: e.target.value
+                            })
+                      }
+                      className='border border-gray-300 rounded p-2 w-full'
+                      required
+                    />
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block mb-1 font-medium'>
+                      Family Members:
+                    </label>
+                    <textarea
+                      value={
+                        dialogMode === 'create'
+                          ? newResident?.familyMembers
+                          : editingResident?.familyMembers
+                      }
+                      onChange={(e) =>
+                        dialogMode === 'create'
+                          ? setNewResident({
+                              ...newResident,
+                              familyMembers: e.target.value
+                            })
+                          : setEditingResident({
+                              ...editingResident,
+                              familyMembers: e.target.value
+                            })
+                      }
+                      className='border border-gray-300 rounded p-2 w-full'
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className='mb-4'>
+                    <label className='block mb-1 font-medium'>Kids:</label>
+                    <select
+                      value={
+                        dialogMode === 'create'
+                          ? newResident?.kids
+                          : editingResident?.kids
+                      }
+                      onChange={(e) =>
+                        dialogMode === 'create'
+                          ? setNewResident({
+                              ...newResident,
+                              kids: parseInt(e.target.value)
+                            })
+                          : setEditingResident({
+                              ...editingResident,
+                              kids: parseInt(e.target.value)
+                            })
+                      }
+                      className='border border-gray-300 rounded p-2 w-full'
+                      required
+                    >
+                      {[...Array(4)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block mb-1 font-medium'>Adults:</label>
+                    <select
+                      value={
+                        dialogMode === 'create'
+                          ? newResident?.adults
+                          : editingResident?.adults
+                      }
+                      onChange={(e) =>
+                        dialogMode === 'create'
+                          ? setNewResident({
+                              ...newResident,
+                              adults: parseInt(e.target.value)
+                            })
+                          : setEditingResident({
+                              ...editingResident,
+                              adults: parseInt(e.target.value)
+                            })
+                      }
+                      className='border border-gray-300 rounded p-2 w-full'
+                      required
+                    >
+                      {[...Array(4)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block mb-1 font-medium'>Pooja:</label>
+
+                    <select
+                      value={
+                        dialogMode === 'create'
+                          ? newResident?.pooja
+                          : editingResident?.pooja
+                      }
+                      onChange={(e) =>
+                        dialogMode === 'create'
+                          ? setNewResident({
+                              ...newResident,
+                              pooja: e.target.value
+                            })
+                          : setEditingResident({
+                              ...editingResident,
+                              pooja: e.target.value
+                            })
+                      }
+                      className='border border-gray-300 rounded p-2 w-full'
+                      required
+                    >
+                      {['Saturday', 'Sunday', 'Monday'].map((val, i) => (
+                        <option key={i + 1} value={val}>
+                          {val}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block mb-1 font-medium'>
+                      Contribution:
+                    </label>
+                    <input
+                      type='text'
+                      value={
+                        dialogMode === 'create'
+                          ? newResident?.contribution
+                          : editingResident?.contribution
+                      }
+                      onChange={(e) =>
+                        dialogMode === 'create'
+                          ? setNewResident({
+                              ...newResident,
+                              contribution: parseInt(e.target.value)
+                            })
+                          : setEditingResident({
+                              ...editingResident,
+                              contribution: parseInt(e.target.value)
+                            })
+                      }
+                      className='border border-gray-300 rounded p-2 w-full'
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-              <div className='mb-4'>
-                <label className='block mb-1 font-medium'>Gothram:</label>
-                <input
-                  type='text'
-                  value={
-                    dialogMode === 'create'
-                      ? newResident?.gothram
-                      : editingResident?.gothram
-                  }
-                  onChange={(e) =>
-                    dialogMode === 'create'
-                      ? setNewResident({
-                          ...newResident,
-                          gothram: e.target.value
-                        })
-                      : setEditingResident({
-                          ...editingResident,
-                          gothram: e.target.value
-                        })
-                  }
-                  className='border border-gray-300 rounded p-2 w-full'
-                  required
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block mb-1 font-medium'>
-                  Family Members:
-                </label>
-                <textarea
-                  value={
-                    dialogMode === 'create'
-                      ? newResident?.familyMembers
-                      : editingResident?.familyMembers
-                  }
-                  onChange={(e) =>
-                    dialogMode === 'create'
-                      ? setNewResident({
-                          ...newResident,
-                          familyMembers: e.target.value
-                        })
-                      : setEditingResident({
-                          ...editingResident,
-                          familyMembers: e.target.value
-                        })
-                  }
-                  className='border border-gray-300 rounded p-2 w-full'
-                  required
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block mb-1 font-medium'>Kids:</label>
-                <select
-                  value={
-                    dialogMode === 'create'
-                      ? newResident?.kids
-                      : editingResident?.kids
-                  }
-                  onChange={(e) =>
-                    dialogMode === 'create'
-                      ? setNewResident({
-                          ...newResident,
-                          kids: parseInt(e.target.value)
-                        })
-                      : setEditingResident({
-                          ...editingResident,
-                          kids: parseInt(e.target.value)
-                        })
-                  }
-                  className='border border-gray-300 rounded p-2 w-full'
-                  required
-                >
-                  {[...Array(4)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className='mb-4'>
-                <label className='block mb-1 font-medium'>Adults:</label>
-                <select
-                  value={
-                    dialogMode === 'create'
-                      ? newResident?.adults
-                      : editingResident?.adults
-                  }
-                  onChange={(e) =>
-                    dialogMode === 'create'
-                      ? setNewResident({
-                          ...newResident,
-                          adults: parseInt(e.target.value)
-                        })
-                      : setEditingResident({
-                          ...editingResident,
-                          adults: parseInt(e.target.value)
-                        })
-                  }
-                  className='border border-gray-300 rounded p-2 w-full'
-                  required
-                >
-                  {[...Array(4)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className='mb-4'>
-                <label className='block mb-1 font-medium'>Pooja:</label>
-                <input
-                  type='text'
-                  value={
-                    dialogMode === 'create'
-                      ? newResident?.pooja
-                      : editingResident?.pooja
-                  }
-                  onChange={(e) =>
-                    dialogMode === 'create'
-                      ? setNewResident({
-                          ...newResident,
-                          pooja: e.target.value
-                        })
-                      : setEditingResident({
-                          ...editingResident,
-                          pooja: e.target.value
-                        })
-                  }
-                  className='border border-gray-300 rounded p-2 w-full'
-                  required
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block mb-1 font-medium'>Contribution:</label>
-                <input
-                  type='text'
-                  value={
-                    dialogMode === 'create'
-                      ? newResident?.contribution
-                      : editingResident?.contribution
-                  }
-                  onChange={(e) =>
-                    dialogMode === 'create'
-                      ? setNewResident({
-                          ...newResident,
-                          contribution: parseInt(e.target.value)
-                        })
-                      : setEditingResident({
-                          ...editingResident,
-                          contribution: parseInt(e.target.value)
-                        })
-                  }
-                  className='border border-gray-300 rounded p-2 w-full'
-                  required
-                />
-              </div>
-              <div className='flex justify-end'>
-                <button
-                  type='submit'
-                  className='bg-blue-500 text-white py-2 px-4 rounded mr-2'
-                >
-                  {dialogMode === 'create' ? 'Add Resident' : 'Update Resident'}
-                </button>
+              <div className='flex justify-end mt-3'>
                 <button
                   type='button'
                   onClick={() => setIsDialogOpen(false)}
-                  className='bg-gray-500 text-white py-2 px-4 rounded'
+                  className='bg-gray-500 text-white py-2 px-4 rounded mr-2'
                 >
                   Cancel
+                </button>
+                <button
+                  type='submit'
+                  className='bg-blue text-white py-2 px-4 rounded '
+                >
+                  {dialogMode === 'create' ? 'Add Resident' : 'Update Resident'}
                 </button>
               </div>
             </form>
