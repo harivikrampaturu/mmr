@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react'; // Headless UI for dialogs
 import ResidentsTable from './View';
-import { printList } from './Print';
+import PrintList from './Print';
 
 // Example user role for demonstration
 const isAdmin = true; // This should come from user authentication context
@@ -90,7 +90,6 @@ export default function ResidentsList() {
     });
 
     const createdResident = await response.json();
-    debugger;
     setResidents([...residents, createdResident.data]);
     setIsDialogOpen(false);
     setNewResident({
@@ -108,12 +107,16 @@ export default function ResidentsList() {
     <div className='p-4'>
       <div className='flex justify-between'>
         {/* Print Button */}
-        <button
+        {/*   <button
           onClick={() => printList(residents)}
           className='bg-green-500 text-white py-2 px-4 rounded mb-4 size-min'
         >
           Print
-        </button>
+        </button> */}
+        <div style={{ margin: '1rem' }}>
+          <br />
+        </div>
+        <PrintList residents={residents} />
         <h1 className='text-2xl font-bold mb-4'>Residents List</h1>
 
         {/* Create Resident Button */}
@@ -252,8 +255,8 @@ export default function ResidentsList() {
                       required
                     >
                       {[...Array(4)].map((_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
+                        <option key={`kids${i + 1}`} value={i}>
+                          {i}
                         </option>
                       ))}
                     </select>
@@ -281,8 +284,8 @@ export default function ResidentsList() {
                       required
                     >
                       {[...Array(4)].map((_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
+                        <option key={i + 1} value={i}>
+                          {i}
                         </option>
                       ))}
                     </select>
@@ -310,7 +313,7 @@ export default function ResidentsList() {
                       className='border border-gray-300 rounded p-2 w-full'
                       required
                     >
-                      {['Saturday', 'Sunday', 'Monday'].map((val, i) => (
+                      {['No', 'Saturday', 'Sunday', 'Monday'].map((val, i) => (
                         <option key={i + 1} value={val}>
                           {val}
                         </option>

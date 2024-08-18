@@ -1,51 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
-  /*   const [translatedResidents, setTranslatedResidents] = useState([
-    ...residents
-  ]); */
-
-  const translatedResidents = residents || [];
-
-  /*   useEffect(() => {
-    const translateText = async (text) => {
-      try {
-        const response = await fetch(
-          `/api/translate?text=${encodeURIComponent(text)}&targetLang=te`
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const responseText = await response.text(); // Use text() to inspect raw response
-        console.log('Response Text:', responseText);
-
-        // Attempt to parse JSON
-        const data = JSON.parse(responseText);
-        return data.translation;
-      } catch (error) {
-        // console.error('Error fetching translation:', error);
-        return '';
-      }
-    };
-
-    const translateResidents = async () => {
-      const translations = await Promise.all(
-        residents.map(async (resident) => ({
-          ...resident,
-          gothram_telugu: await translateText(resident.gothram),
-          familyMembers_telugu: await translateText(resident.familyMembers),
-          kids_telugu: await translateText(resident.kids),
-          adults_telugu: await translateText(resident.adults)
-        }))
-      );
-      setTranslatedResidents(translations);
-    };
-
-    translateResidents();
-  }, [residents]);
- */
+  const translatedResidents = residents;
   return (
     <div className='overflow-x-auto p-16 pt-4'>
       <table className='min-w-full bg-white border border-gray-200 rounded'>
@@ -91,15 +47,9 @@ const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
               </td>
               <td className='py-2 px-4'>
                 <div>{resident.kids}</div>
-                <div className='text-xs text-gray-500'>
-                  {resident?.kids_telugu}
-                </div>
               </td>
               <td className='py-2 px-4'>
                 <div>{resident.adults}</div>
-                <div className='text-xs text-gray-500'>
-                  {resident?.adults_telugu}
-                </div>
               </td>
               <td className='py-2 px-4'>
                 <div>{resident?.pooja}</div>
