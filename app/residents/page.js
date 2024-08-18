@@ -139,6 +139,9 @@ export default function ResidentsList() {
         handleDelete={handleDelete}
       />
 
+      {/* Summary */}
+      {Boolean(residents?.length) && <ResidentsSummary residents={residents} />}
+
       {/* Dialog for Create/Edit Resident */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         <div
