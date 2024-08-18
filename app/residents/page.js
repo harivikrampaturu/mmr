@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react'; // Headless UI for dialogs
 import ResidentsTable from './View';
 import PrintList from './Print';
-// import ResidentsSummary from './Summary';
+import ResidentsSummary from './Summary';
 
 // Example user role for demonstration
 const isAdmin = true; // This should come from user authentication context
@@ -141,7 +141,7 @@ export default function ResidentsList() {
       />
 
       {/* Summary */}
-      {/* {Boolean(residents?.length) && <ResidentsSummary residents={residents} />} */}
+      {Boolean(residents?.length) && <ResidentsSummary residents={residents} />}
 
       {/* Dialog for Create/Edit Resident */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
