@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react'; // Headless UI for dialogs
 import ResidentsTable from './View';
 import PrintList from './Print';
+import ResidentsSummary from './Summary';
 
 // Example user role for demonstration
 const isAdmin = true; // This should come from user authentication context
