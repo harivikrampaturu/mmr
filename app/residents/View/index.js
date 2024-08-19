@@ -1,7 +1,11 @@
 import React from 'react';
 
 const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
-  const translatedResidents = residents;
+  const translatedResidents = residents.sort((a, b) => {
+    if (a.flatNo < b.flatNo) return -1;
+    else if (a.flatNo > b.flatNo) return 1;
+    return 0;
+  });
   return (
     <div className='overflow-x-auto p-16 pt-4'>
       <table className='min-w-full bg-white border border-gray-200 rounded'>

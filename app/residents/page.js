@@ -258,7 +258,7 @@ export default function ResidentsList() {
                       className='border border-gray-300 rounded p-2 w-full'
                       required
                     >
-                      {[...Array(4)].map((_, i) => (
+                      {[...Array(5)].map((_, i) => (
                         <option key={`kids${i + 1}`} value={i}>
                           {i}
                         </option>
@@ -287,7 +287,7 @@ export default function ResidentsList() {
                       className='border border-gray-300 rounded p-2 w-full'
                       required
                     >
-                      {[...Array(4)].map((_, i) => (
+                      {[...Array(5)].map((_, i) => (
                         <option key={i + 1} value={i}>
                           {i}
                         </option>
