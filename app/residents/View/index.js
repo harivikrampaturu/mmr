@@ -1,7 +1,7 @@
 import React from 'react';
 
 const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
-  const translatedResidents = residents.sort((a, b) => {
+  const translatedResidents = residents?.sort((a, b) => {
     if (a.flatNo < b.flatNo) return -1;
     else if (a.flatNo > b.flatNo) return 1;
     return 0;

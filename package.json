@@ -11,9 +11,11 @@
   "dependencies": {
     "@google-cloud/translate": "^8.3.0",
     "@headlessui/react": "^2.1.2",
+    "antd": "^5.20.3",
     "i18next": "^23.12.2",
     "mongoose": "^8.5.2",
     "next": "14.2.5",
+    "node-fetch": "^3.3.2",
     "react": "^18",
     "react-dom": "^18",
     "react-i18next": "^15.0.1",

@@ -5,6 +5,7 @@ import { Dialog } from '@headlessui/react'; // Headless UI for dialogs
 import ResidentsTable from './View';
 import PrintList from './Print';
 import ResidentsSummary from './Summary';
+import Loader from '../common/components/Loader';
 
 // Example user role for demonstration
 const isAdmin = true; // This should come from user authentication context
@@ -23,11 +24,16 @@ export default function ResidentsList() {
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState('create'); // 'create' or 'edit'
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     fetch('/api/residents')
       .then((res) => res.json())
-      .then((data) => setResidents(data.data));
+      .then((data) => {
+        setLoading(false);
+        setResidents(data.data);
+      });
   }, []);
 
   const handleDelete = async (id) => {
@@ -104,16 +110,11 @@ export default function ResidentsList() {
     });
   };
 
+  if (loading) return <Loader />;
+
   return (
     <div className='p-4'>
       <div className='flex justify-between'>
-        {/* Print Button */}
-        {/*   <button
-          onClick={() => printList(residents)}
-          className='bg-green-500 text-white py-2 px-4 rounded mb-4 size-min'
-        >
-          Print
-        </button> */}
         <div style={{ margin: '1rem' }}>
           <br />
         </div>
