@@ -42,7 +42,6 @@ const PrintList = ({ residents = [] }) => {
     };
 
     if (residents.length > 0) {
-      console.log('resident.gothram =>', resident.gothram);
       translateResidents();
     }
 
