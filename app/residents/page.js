@@ -20,7 +20,8 @@ export default function ResidentsList() {
     kids: 1,
     adults: 1,
     pooja: 'Saturday',
-    contribution: 1116
+    contribution: 1116,
+    comments: ''
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState('create'); // 'create' or 'edit'
@@ -69,7 +70,8 @@ export default function ResidentsList() {
       kids: editingResident.kids,
       adults: editingResident.adults,
       pooja: editingResident.pooja,
-      contribution: editingResident.contribution
+      contribution: editingResident.contribution,
+      comments: editingResident.comments
     };
 
     const response = await fetch('/api/residents', {
@@ -106,7 +108,8 @@ export default function ResidentsList() {
       kids: 1,
       adults: 1,
       pooja: 'Saturday',
-      contribution: 1116
+      contribution: 1116,
+      comments: ''
     });
   };
 
@@ -345,6 +348,30 @@ export default function ResidentsList() {
                           : setEditingResident({
                               ...editingResident,
                               contribution: parseInt(e.target.value)
+                            })
+                      }
+                      className='border border-gray-300 rounded p-2 w-full'
+                      required
+                    />
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block mb-1 font-medium'>Comments:</label>
+                    <input
+                      type='text'
+                      value={
+                        dialogMode === 'create'
+                          ? newResident?.comments
+                          : editingResident?.comments
+                      }
+                      onChange={(e) =>
+                        dialogMode === 'create'
+                          ? setNewResident({
+                              ...newResident,
+                              comments: e.target.value
+                            })
+                          : setEditingResident({
+                              ...editingResident,
+                              comments: e.target.value
                             })
                       }
                       className='border border-gray-300 rounded p-2 w-full'

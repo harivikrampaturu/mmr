@@ -8,7 +8,8 @@ const ResidentSchema = new mongoose.Schema({
   adults: { type: Number, required: true },
   isApproved: { type: Boolean, default: false },
   contribution: { type: Number, required: true },
-  pooja: { type: String, required: false }
+  pooja: { type: String, required: false },
+  comments: { type: String, required: false }
 });
 
 export default mongoose.models.Resident ||

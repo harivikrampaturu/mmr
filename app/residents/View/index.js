@@ -30,6 +30,7 @@ const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
             </th>
             <th className='py-2 px-4 text-left'>Pooja Day</th>
             <th className='py-2 px-4 text-left'>Contribution</th>
+            <th className='py-2 px-4 text-left'>Comments</th>
             {isAdmin && <th className='py-2 px-4 text-left'>Actions</th>}
           </tr>
         </thead>
@@ -60,6 +61,9 @@ const ResidentsTable = ({ residents, isAdmin, handleEdit, handleDelete }) => {
               </td>
               <td className='py-2 px-4'>
                 <div>{resident?.contribution}</div>
+              </td>
+              <td className='py-2 px-4'>
+                <div>{resident?.comments}</div>
               </td>
               {isAdmin && (
                 <td className='py-2 px-4 flex space-x-2'>
