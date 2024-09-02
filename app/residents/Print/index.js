@@ -1,8 +1,16 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
+import { ChevronDownIcon } from '@heroicons/react/24/solid';
 
 const PrintList = ({ residents = [] }) => {
-  const handlePrint = async () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handlePrint = async (print = 'all') => {
+    let printableResidents = residents;
+    if (String(print).toLowerCase() !== 'all') {
+      printableResidents = residents.filter(({ pooja }) => pooja === print);
+    }
+
     const translateText = async (text) => {
       try {
         const response = await fetch(
@@ -24,7 +32,7 @@ const PrintList = ({ residents = [] }) => {
     const translateResidents = async () => {
       try {
         const translations = await Promise.all(
-          residents.map(async (resident) => {
+          printableResidents.map(async (resident) => {
             const [gothram_telugu, familyMembers_telugu] = await Promise.all([
               translateText(resident.gothram),
               translateText(resident.familyMembers)
@@ -60,15 +68,19 @@ const PrintList = ({ residents = [] }) => {
       );
       printWindow.document.write('</style>');
       printWindow.document.write('</head><body>');
-      printWindow.document.write('<h1>Residents List</h1>');
+      printWindow.document.write(
+        `<h1>${print !== 'all' ? `${print} Pooja` : 'Residents'} list  (${
+          translatedResidents.length
+        })</h1>`
+      );
       printWindow.document.write('<table>');
       printWindow.document.write('<thead>');
       printWindow.document.write('<tr>');
       printWindow.document.write('<th>Flat No</th>');
       printWindow.document.write('<th>Gothram</th>');
       printWindow.document.write('<th>Family Members</th>');
-      printWindow.document.write('<th>Kids</th>');
-      printWindow.document.write('<th>Adults</th>');
+      /*       printWindow.document.write('<th>Kids</th>');
+      printWindow.document.write('<th>Adults</th>'); */
       printWindow.document.write('</tr>');
       printWindow.document.write('</thead>');
       printWindow.document.write('<tbody>');
@@ -81,8 +93,8 @@ const PrintList = ({ residents = [] }) => {
         printWindow.document.write(
           `<td>${resident.familyMembers} <br/> ${resident?.familyMembers_telugu}</td>`
         );
-        printWindow.document.write(`<td>${resident.kids}</td>`);
-        printWindow.document.write(`<td>${resident.adults}</td>`);
+        /*         printWindow.document.write(`<td>${resident.kids}</td>`);
+        printWindow.document.write(`<td>${resident.adults}</td>`); */
         printWindow.document.write('</tr>');
       });
       printWindow.document.write('</tbody>');
@@ -93,9 +105,59 @@ const PrintList = ({ residents = [] }) => {
     };
   };
 
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
   return (
-    <div className='absolute left-5 top-18 bg-green-500 text-white py-2 px-4 rounded mb-4 size-min'>
-      <button onClick={handlePrint}> Print </button>
+    <div className='absolute left-5 top-18 bg-green-500 text-white py-2 px-4 rounded mb-4 size-min '>
+      <div className='flex items-center'>
+        <button onClick={handlePrint} className='mr-2'>
+          Print
+        </button>
+        <button
+          onClick={handleDropdownToggle}
+          className='focus:outline-none h-50 w-4'
+        >
+          <ChevronDownIcon className='h-5 w-5 text-white' />
+        </button>
+      </div>
+      {isDropdownOpen && (
+        <div className='absolute left-0 mt-2 w-48 bg-white rounded shadow-lg z-10 text-black'>
+          <ul>
+            <li>
+              <button
+                onClick={() => {
+                  handlePrint('Saturday');
+                }}
+                className='block w-full text-left px-4 py-2 hover:bg-gray-100'
+              >
+                Print Saturday
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  handlePrint('Sunday');
+                }}
+                className='block w-full text-left px-4 py-2 hover:bg-gray-100'
+              >
+                Print Sunday
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  handlePrint('Monday');
+                }}
+                className='block w-full text-left px-4 py-2 hover:bg-gray-100'
+              >
+                Print Monday
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

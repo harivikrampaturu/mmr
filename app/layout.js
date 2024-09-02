@@ -18,6 +18,7 @@ export default function RootLayout({ children }) {
           <Link href='/' className='flex items-center' prefetch={false}>
             <span className='text-lg font-bold text-sky-600 drop-shadow-lg'>
               {/* Matri Mirra Residency */}
+              <img src='/logo.png' className='max-w-[80px]' />
             </span>
           </Link>
           <nav className='flex items-center gap-4'>
