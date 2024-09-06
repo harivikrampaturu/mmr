@@ -131,7 +131,7 @@ const ExpenseManager = () => {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
-      render: (text) => <span>${text}</span>
+      render: (text) => <span>₹ {text}</span>
     },
     {
       title: 'Actions',
