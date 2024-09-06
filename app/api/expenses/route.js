@@ -53,8 +53,11 @@ export async function POST(request) {
 export async function PUT(request, { params }) {
   try {
     await dbConnect();
-    const { id } = params;
+    const url = new URL(request.url);
+
+    const id = url.pathname.split('/').pop();
     const data = await request.json();
+
     const updatedExpense = await Expense.findByIdAndUpdate(id, data, {
       new: true,
       runValidators: true
@@ -90,10 +93,12 @@ export async function PUT(request, { params }) {
 }
 
 // DELETE expense by ID
-export async function DELETE(_, { params }) {
+export async function DELETE(request) {
   try {
     await dbConnect();
-    const { id } = params;
+    const url = new URL(request.url);
+
+    const id = url.pathname.split('/').pop();
     const deletedExpense = await Expense.findByIdAndDelete(id);
     if (!deletedExpense) {
       return new Response(
