@@ -84,6 +84,7 @@ const PrintList = ({ residents = [] }) => {
       if (print === 'all') {
         printWindow.document.write('<th>Kids</th>');
         printWindow.document.write('<th>Adults</th>');
+        printWindow.document.write('<th>Pooja</th>');
       }
       printWindow.document.write('</tr>');
       printWindow.document.write('</thead>');
@@ -100,6 +101,7 @@ const PrintList = ({ residents = [] }) => {
         if (print === 'all') {
           printWindow.document.write(`<td>${resident.kids}</td>`);
           printWindow.document.write(`<td>${resident.adults}</td>`);
+          printWindow.document.write(`<td>${resident.pooja}</td>`);
         }
 
         printWindow.document.write('</tr>');
