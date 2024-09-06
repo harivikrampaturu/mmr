@@ -6,9 +6,11 @@ const PrintList = ({ residents = [] }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handlePrint = async (print = 'all') => {
-    let printableResidents = residents;
+    let printableResidents = [...residents];
     if (String(print).toLowerCase() !== 'all') {
-      printableResidents = residents.filter(({ pooja }) => pooja === print);
+      printableResidents = printableResidents.filter(
+        ({ pooja }) => pooja === print
+      );
     }
 
     const translateText = async (text) => {
@@ -49,7 +51,7 @@ const PrintList = ({ residents = [] }) => {
       }
     };
 
-    if (residents.length > 0) {
+    if (printableResidents.length > 0) {
       translateResidents();
     }
 
@@ -79,8 +81,10 @@ const PrintList = ({ residents = [] }) => {
       printWindow.document.write('<th>Flat No</th>');
       printWindow.document.write('<th>Gothram</th>');
       printWindow.document.write('<th>Family Members</th>');
-      /*       printWindow.document.write('<th>Kids</th>');
-      printWindow.document.write('<th>Adults</th>'); */
+      if (print === 'all') {
+        printWindow.document.write('<th>Kids</th>');
+        printWindow.document.write('<th>Adults</th>');
+      }
       printWindow.document.write('</tr>');
       printWindow.document.write('</thead>');
       printWindow.document.write('<tbody>');
@@ -93,8 +97,11 @@ const PrintList = ({ residents = [] }) => {
         printWindow.document.write(
           `<td>${resident.familyMembers} <br/> ${resident?.familyMembers_telugu}</td>`
         );
-        /*         printWindow.document.write(`<td>${resident.kids}</td>`);
-        printWindow.document.write(`<td>${resident.adults}</td>`); */
+        if (print === 'all') {
+          printWindow.document.write(`<td>${resident.kids}</td>`);
+          printWindow.document.write(`<td>${resident.adults}</td>`);
+        }
+
         printWindow.document.write('</tr>');
       });
       printWindow.document.write('</tbody>');
@@ -112,7 +119,12 @@ const PrintList = ({ residents = [] }) => {
   return (
     <div className='absolute left-5 top-18 bg-green-500 text-white py-2 px-4 rounded mb-4 size-min '>
       <div className='flex items-center'>
-        <button onClick={handlePrint} className='mr-2'>
+        <button
+          onClick={() => {
+            handlePrint('all');
+          }}
+          className='mr-2'
+        >
           Print
         </button>
         <button
