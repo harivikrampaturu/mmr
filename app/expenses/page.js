@@ -71,10 +71,10 @@ const ExpenseManager = () => {
   // Update existing expense
   const updateExpense = async (values) => {
     try {
-      const res = await fetch(`/api/expenses/${currentExpense._id}`, {
+      const res = await fetch(`/api/expenses`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify({ id: currentExpense._id, ...values })
       });
       if (res.ok) {
         fetchExpenses();
@@ -90,8 +90,9 @@ const ExpenseManager = () => {
   // Delete expense
   const deleteExpense = async (id) => {
     try {
-      const res = await fetch(`/api/expenses/${id}`, {
-        method: 'DELETE'
+      const res = await fetch(`/api/expenses/`, {
+        method: 'DELETE',
+        body: JSON.stringify({ id })
       });
       if (res.ok) {
         fetchExpenses();

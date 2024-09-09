@@ -50,13 +50,11 @@ export async function POST(request) {
 }
 
 // UPDATE expense by ID
-export async function PUT(request, { params }) {
+export async function PUT(request) {
   try {
     await dbConnect();
-    const url = new URL(request.url);
-
-    const id = url.pathname.split('/').pop();
     const data = await request.json();
+    const { id } = data || {};
 
     const updatedExpense = await Expense.findByIdAndUpdate(id, data, {
       new: true,
@@ -96,9 +94,9 @@ export async function PUT(request, { params }) {
 export async function DELETE(request) {
   try {
     await dbConnect();
-    const url = new URL(request.url);
+    const data = await request.json();
+    const { id } = data || {};
 
-    const id = url.pathname.split('/').pop();
     const deletedExpense = await Expense.findByIdAndDelete(id);
     if (!deletedExpense) {
       return new Response(
