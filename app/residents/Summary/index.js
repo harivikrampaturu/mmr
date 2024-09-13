@@ -63,7 +63,7 @@ const ResidentsSummary = ({ residents = [], expenses, isAdmin = false }) => {
         </a>
       </p>
       <p>
-        Total (laddu(2.7k) + idol(12K) + auction(17k)): Rs.{' '}
+        Total (laddu(2.7k) + idol(12.021K) + auction(17k)): Rs.{' '}
         <b>{totals.totalContribution + assetsAmount + auctionFund}</b>
       </p>
 
