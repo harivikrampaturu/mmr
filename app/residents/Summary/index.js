@@ -52,7 +52,7 @@ const ResidentsSummary = ({ residents = [], expenses, isAdmin = false }) => {
       </p>
       <p>
         {' '}
-        Liquid Expenses: {totalExpenses}{' '}
+        Liquid Expenses: <span className='text-red-500'>{totalExpenses} </span>
         <a
           href='/expenses'
           title='expenses link'
@@ -69,12 +69,14 @@ const ResidentsSummary = ({ residents = [], expenses, isAdmin = false }) => {
 
       <p>
         Total Expenses (Liquid Expenses + idol + laddu):{' '}
-        {totalExpenses + assetsAmount}
+        <span className='text-red-500'>{totalExpenses + assetsAmount}</span>
       </p>
       <br />
       <p>
         Total Balance:{' '}
-        <b>{totals.totalContribution + auctionFund - totalExpenses}</b>
+        <b className='text-green-500'>
+          {totals.totalContribution + auctionFund - totalExpenses}
+        </b>
         <i> ( (Liquid Contribution + Auction Fund) - Liquid Expenses)</i>
       </p>
       {isAdmin && (
