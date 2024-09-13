@@ -20,6 +20,25 @@ const ExpenseManager = () => {
   const [currentExpense, setCurrentExpense] = useState(null);
   const [form] = Form.useForm();
 
+  const [isAdmin, setAdmin] = useState(false);
+
+  // Function to handle key press
+  const handleKeyPress = (event) => {
+    // Check if Shift + Ctrl + L is pressed
+    if (event.shiftKey && event.ctrlKey && event.key.toLowerCase() === 'l') {
+      setAdmin((prevAdmin) => !prevAdmin); // Toggle the admin state
+    }
+  };
+
+  // Add event listener for keydown when the component mounts
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
+
   // Fetch all expenses on component mount
   useEffect(() => {
     fetchExpenses();
@@ -121,8 +140,9 @@ const ExpenseManager = () => {
     form.resetFields();
   };
 
+  let columns;
   // Table columns
-  const columns = [
+  columns = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -157,6 +177,8 @@ const ExpenseManager = () => {
     }
   ];
 
+  if (!isAdmin) columns = columns.filter(({ key }) => key !== 'actions');
+
   // Calculate total amount
   const totalAmount =
     expenses && expenses.length
@@ -176,6 +198,7 @@ const ExpenseManager = () => {
         columns={columns}
         rowKey='_id'
         pagination={false}
+        style={{ maxWidth: '650px', margin: '0 auto' }}
         footer={() => (
           <div className='text-right font-bold'>
             Total Amount: Rs.{totalAmount}

@@ -8,7 +8,6 @@ import ResidentsSummary from './Summary';
 import Loader from '../common/components/Loader';
 
 // Example user role for demonstration
-const isAdmin = true; // This should come from user authentication context
 
 export default function ResidentsList() {
   const [residents, setResidents] = useState([]);
@@ -26,6 +25,36 @@ export default function ResidentsList() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState('create'); // 'create' or 'edit'
   const [loading, setLoading] = useState(false);
+  const [expenses, setExpenses] = useState(0);
+
+  const [isAdmin, setAdmin] = useState(false);
+
+  // Function to handle key press
+  const handleKeyPress = (event) => {
+    // Check if Shift + Ctrl + L is pressed
+    if (event.shiftKey && event.ctrlKey && event.key.toLowerCase() === 'l') {
+      setAdmin((prevAdmin) => !prevAdmin); // Toggle the admin state
+    }
+  };
+
+  // Add event listener for keydown when the component mounts
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const res = await fetch('/api/expenses');
+      const { data } = await res.json();
+      setExpenses(data);
+    } catch (error) {
+      message.error('Failed to fetch expenses.');
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -35,6 +64,7 @@ export default function ResidentsList() {
         setLoading(false);
         setResidents(data.data);
       });
+    fetchExpenses();
   }, []);
 
   const handleDelete = async (id) => {
@@ -125,15 +155,26 @@ export default function ResidentsList() {
         <h1 className='text-2xl font-bold mb-4'>Residents List</h1>
 
         {/* Create Resident Button */}
-        {isAdmin && (
+        {isAdmin ? (
           <button
             onClick={handleCreate}
             className='bg-blue text-white py-2 px-4 rounded mb-4'
           >
             Add New Resident
           </button>
+        ) : (
+          <div></div>
         )}
       </div>
+
+      {/* Summary */}
+      {Boolean(residents?.length) && (
+        <ResidentsSummary
+          residents={residents}
+          expenses={expenses}
+          isAdmin={isAdmin}
+        />
+      )}
 
       {/* Residents List */}
 
@@ -143,9 +184,6 @@ export default function ResidentsList() {
         handleEdit={handleEdit}
         handleDelete={handleDelete}
       />
-
-      {/* Summary */}
-      {Boolean(residents?.length) && <ResidentsSummary residents={residents} />}
 
       {/* Dialog for Create/Edit Resident */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>

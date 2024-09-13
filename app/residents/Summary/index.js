@@ -1,6 +1,10 @@
 import React from 'react';
 
-const ResidentsSummary = ({ residents = [] }) => {
+const ResidentsSummary = ({ residents = [], expenses, isAdmin = false }) => {
+  const totalExpenses =
+    expenses && expenses.length
+      ? expenses.reduce((acc, item) => acc + item.amount, 0)
+      : 0;
   const totals = residents.reduce(
     (acc, resident) => {
       acc.totalContribution += resident.contribution;
@@ -27,17 +31,62 @@ const ResidentsSummary = ({ residents = [] }) => {
     }
   );
 
+  const assetsAmount = 2700 + 12021;
+  const auctionFund = 17000;
+
   return (
-    <div className='ml-16 -mt-10'>
-      <h2 className='text-orange-400'>Residents Summary</h2>
+    <div
+      className='ml-16 mt-10'
+      style={{
+        background: '#fff',
+        boxShadow: '1px 0px 2px 2px #ddd',
+        padding: '2rem',
+        borderRadius: '10px'
+      }}
+    >
+      <h2 className='text-orange-400'>
+        <b> Summary </b>
+      </h2>
       <p>
-        Total Contribution: Rs. <b>{totals.totalContribution}</b>
+        Liquid Contribution: Rs. <b>{totals.totalContribution}</b>
       </p>
-      <p>Total Kids: {totals.totalKids}</p>
-      <p>Total Adults: {totals.totalAdults}</p>
-      <p>Pooja (Saturday): {totals.saturdayPooja}</p>
-      <p>Pooja (Sunday): {totals.sundayPooja}</p>
-      <p>Pooja (Monday): {totals.mondayPooja}</p>
+      <p>
+        {' '}
+        Liquid Expenses: {totalExpenses}{' '}
+        <a
+          href='/expenses'
+          title='expenses link'
+          target='_blank'
+          style={{ color: 'blueviolet' }}
+        >
+          (click here)
+        </a>
+      </p>
+      <p>
+        Total (laddu(2.7k) + idol(12K) + auction(17k)): Rs.{' '}
+        <b>{totals.totalContribution + assetsAmount + auctionFund}</b>
+      </p>
+
+      <p>
+        Total Expenses (Liquid Expenses + idol + laddu):{' '}
+        {totalExpenses + assetsAmount}
+      </p>
+      <br />
+      <p>
+        Total Balance:{' '}
+        <b>{totals.totalContribution + auctionFund - totalExpenses}</b>
+        <i> ( (Liquid Contribution + Auction Fund) - Liquid Expenses)</i>
+      </p>
+      {isAdmin && (
+        <>
+          {' '}
+          <p>Total Kids: {totals.totalKids}</p>
+          <p>Total Adults: {totals.totalAdults}</p>
+          <p>Pooja (Saturday): {totals.saturdayPooja}</p>
+          <p>Pooja (Sunday): {totals.sundayPooja}</p>
+          <p>Pooja (Monday): {totals.mondayPooja}</p>
+        </>
+      )}
     </div>
   );
 };
