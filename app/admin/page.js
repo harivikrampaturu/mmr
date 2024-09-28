@@ -50,10 +50,6 @@ const AdminPage = () => {
     return maintenanceData.reduce((total, record) => total + record.amount, 0);
   };
 
-  const calculateTotalExpenses = (expenses) => {
-    return expenses.reduce((total, expense) => total + expense.amount, 0);
-  };
-
   const handleCreateMonth = async () => {
     try {
       const values = await form.validateFields();
@@ -172,6 +168,10 @@ const AdminPage = () => {
 
 const ExpenseDetails = ({ expenses, onAddExpense }) => {
   const [expenseForm] = Form.useForm();
+
+  const calculateTotalExpenses = (expenses) => {
+    return expenses.reduce((total, expense) => total + expense.amount, 0);
+  };
 
   const handleAddExpense = async () => {
     try {
