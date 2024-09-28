@@ -25,6 +25,10 @@ const AdminPage = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
 
+  const calculateTotalExpenses = (expenses) => {
+    return expenses.reduce((total, expense) => total + expense.amount, 0);
+  };
+
   useEffect(() => {
     fetchMaintenanceMonths();
   }, []);
@@ -82,13 +86,13 @@ const AdminPage = () => {
     {
       title: 'Total Maintenance',
       render: (text, record) => (
-        <span>{calculateTotalMaintenance(record.maintenanceData)}</span>
+        <span>{calculateTotalMaintenance(record?.maintenanceData)}</span>
       )
     },
     {
       title: 'Total Expenses',
       render: (text, record) => (
-        <span>{calculateTotalExpenses(record.expenses)}</span>
+        <span>{calculateTotalExpenses(record?.expenses)}</span>
       )
     },
     {
@@ -133,7 +137,7 @@ const AdminPage = () => {
           <Tabs defaultActiveKey='1'>
             <Tabs.TabPane tab='Expenses' key='1'>
               <ExpenseDetails
-                expenses={selectedMonth.expenses}
+                expenses={selectedMonth?.expenses}
                 onAddExpense={handleAddExpense}
               />
             </Tabs.TabPane>
