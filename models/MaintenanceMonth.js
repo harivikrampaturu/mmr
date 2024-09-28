@@ -15,11 +15,10 @@ const ExpenseSchema = new mongoose.Schema({
 
 const MaintenanceMonthSchema = new mongoose.Schema({
   monthName: { type: String, required: true },
-  totalMaintenance: { type: Number, required: true },
-  totalExpenses: { type: Number, required: true },
-  maintenanceData: [MaintenanceRecordSchema],
-  expenses: [ExpenseSchema]
+  maintenanceData: [MaintenanceRecordSchema], // List of maintenance records
+  expenses: [ExpenseSchema] // List of expenses for the month
 });
 
+// Export the model if not already created
 export default mongoose.models.MaintenanceMonth ||
   mongoose.model('MaintenanceMonth', MaintenanceMonthSchema);
