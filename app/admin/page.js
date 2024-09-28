@@ -69,6 +69,18 @@ const AdminPage = () => {
     }
   };
 
+  const handleAddExpense = async (expense) => {
+    if (selectedMonth) {
+      const updatedExpenses = [...selectedMonth.expenses, expense];
+      await axios.post(
+        `/api/maintenance/${selectedMonth._id}/expenses`,
+        expense
+      );
+      setSelectedMonth({ ...selectedMonth, expenses: updatedExpenses });
+      message.success('Expense added successfully!');
+    }
+  };
+
   const columns = [
     { title: 'Month Name', dataIndex: 'monthName', key: 'monthName' },
     {
@@ -124,7 +136,10 @@ const AdminPage = () => {
         {selectedMonth && (
           <Tabs defaultActiveKey='1'>
             <Tabs.TabPane tab='Expenses' key='1'>
-              <ExpenseDetails expenses={selectedMonth.expenses} />
+              <ExpenseDetails
+                expenses={selectedMonth.expenses}
+                onAddExpense={handleAddExpense}
+              />
             </Tabs.TabPane>
             <Tabs.TabPane tab='Maintenance Data' key='2'>
               <MaintenanceDetails
@@ -155,27 +170,53 @@ const AdminPage = () => {
   );
 };
 
-const ExpenseDetails = ({ expenses }) => (
-  <div>
-    {expenses.map((expense, index) => (
-      <div key={index} className='mb-2'>
-        <Input
-          defaultValue={expense.name}
-          placeholder='Name'
-          className='mb-1'
-        />
-        <Input
-          defaultValue={expense.amount}
-          placeholder='Amount'
-          type='number'
-        />
-      </div>
-    ))}
-    <Button type='dashed' className='mt-2'>
-      Add Expense
-    </Button>
-  </div>
-);
+const ExpenseDetails = ({ expenses, onAddExpense }) => {
+  const [expenseForm] = Form.useForm();
+
+  const handleAddExpense = async () => {
+    try {
+      const values = await expenseForm.validateFields();
+      onAddExpense(values);
+      expenseForm.resetFields();
+    } catch (error) {
+      console.error('Failed to add expense:', error);
+      message.error('Failed to add expense.');
+    }
+  };
+
+  return (
+    <div>
+      <Form form={expenseForm} layout='vertical' onFinish={handleAddExpense}>
+        <Form.Item
+          name='name'
+          label='Expense Name'
+          rules={[{ required: true, message: 'Please enter expense name!' }]}
+        >
+          <Input placeholder='Expense Name' />
+        </Form.Item>
+        <Form.Item
+          name='amount'
+          label='Amount'
+          rules={[{ required: true, message: 'Please enter an amount!' }]}
+        >
+          <Input type='number' placeholder='Amount' />
+        </Form.Item>
+        <Button type='primary' htmlType='submit'>
+          Add Expense
+        </Button>
+      </Form>
+      <h3 className='mt-4'>Expenses List</h3>
+      <ul>
+        {expenses.map((expense, index) => (
+          <li key={index}>
+            {expense.name}: ${expense.amount}
+          </li>
+        ))}
+      </ul>
+      <h4>Total Expenses: ${calculateTotalExpenses(expenses)}</h4>
+    </div>
+  );
+};
 
 const MaintenanceDetails = ({ maintenanceData }) => (
   <div>
