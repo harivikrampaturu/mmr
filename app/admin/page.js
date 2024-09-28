@@ -213,7 +213,7 @@ const ExpenseDetails = ({ expenses, onAddExpense }) => {
           </li>
         ))}
       </ul>
-      <h4>Total Expenses: ${calculateTotalExpenses(expenses)}</h4>
+      <h4>Total Expenses: {calculateTotalExpenses(expenses)}</h4>
     </div>
   );
 };
