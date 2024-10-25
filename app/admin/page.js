@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/firebase';
+import { auth } from '@/lib/firebase'; // Ensure firebase config is correct
 import axios from 'axios';
 import {
   Table,
@@ -21,7 +21,6 @@ import MaintenanceMonthExpenses from './MonthExpenses';
 import MaintenanceDetails from './MaintenanceDetails';
 import { PAYMENT_PAID, PAYMENT_PARTIAL, PAYMENT_PENDING } from '../constants';
 import Logout from '../common/components/Logout';
-// import 'antd/dist/antd.css';
 
 const AdminPage = () => {
   const [months, setMonths] = useState([]);
@@ -36,28 +35,18 @@ const AdminPage = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
-        // User is not logged in, redirect to login page
-        router.push('/login');
+        router.push('/login'); // Ensure proper user session handling
       }
     });
 
-    // Clean up the listener when the component unmounts
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
-  const calculateTotalExpenses = (expenses) => {
-    return expenses.reduce((total, expense) => total + expense.amount, 0);
-  };
-
-  useEffect(() => {
-    fetchMaintenanceMonths();
-  }, []);
-
+  // Fetch maintenance months data
   const fetchMaintenanceMonths = async () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/maintenances');
-      console.log('response==>', response);
       setMonths(response?.data?.data.reverse());
     } catch (error) {
       console.error('Failed to fetch maintenance months:', error);
@@ -66,21 +55,11 @@ const AdminPage = () => {
     }
   };
 
-  const handleViewMonth = (record) => {
-    setSelectedMonth(record);
-    setDrawerVisible(true);
-  };
+  useEffect(() => {
+    fetchMaintenanceMonths();
+  }, []);
 
-  const calculateTotalMaintenance = (maintenanceData, amounts) => {
-    return maintenanceData.reduce((total, record) => {
-      console.log(record, 'record');
-      if (record.payment === PAYMENT_PAID) return total + amounts.amount;
-      else if (record.payment === PAYMENT_PENDING) return total + 0;
-      else if (record.payment === PAYMENT_PARTIAL)
-        return total + amounts.partial;
-    }, 0);
-  };
-
+  // Create New Month
   const handleCreateMonth = async () => {
     try {
       const values = await form.validateFields();
@@ -91,11 +70,30 @@ const AdminPage = () => {
       message.success('Maintenance month created successfully!');
       setModalVisible(false);
       form.resetFields();
-      fetchMaintenanceMonths();
+      fetchMaintenanceMonths(); // Refresh list
     } catch (error) {
       console.error('Failed to create maintenance month:', error);
       message.error('Failed to create maintenance month.');
     }
+  };
+
+  const handleViewMonth = (record) => {
+    setSelectedMonth(record);
+    setDrawerVisible(true);
+  };
+
+  const calculateTotalMaintenance = (maintenanceData, amounts) => {
+    return maintenanceData.reduce((total, record) => {
+      if (record.payment === PAYMENT_PAID) return total + amounts.amount;
+      else if (record.payment === PAYMENT_PENDING) return total;
+      else if (record.payment === PAYMENT_PARTIAL)
+        return total + amounts.partial;
+      return total;
+    }, 0);
+  };
+
+  const calculateTotalExpenses = (expenses) => {
+    return expenses.reduce((total, expense) => total + expense.amount, 0);
   };
 
   const columns = [
@@ -127,8 +125,6 @@ const AdminPage = () => {
     }
   ];
 
-  console.log('selectedMonth ==>', selectedMonth);
-
   return (
     <div className='container mx-auto p-4'>
       <div className='flex flex-row items-center justify-between'>
@@ -147,6 +143,7 @@ const AdminPage = () => {
           <Logout />
         </div>
       </div>
+
       <Table
         dataSource={months}
         columns={columns}
@@ -154,38 +151,33 @@ const AdminPage = () => {
         rowKey='_id'
         pagination={{ pageSize: 5 }}
       />
-      {/* Drawer for detailed view */}
+
       {selectedMonth && (
         <Drawer
-          title={
-            selectedMonth
-              ? `${selectedMonth.monthName} Details`
-              : 'Month Details'
-          }
+          title={`${selectedMonth.monthName} Details`}
           width={720}
           onClose={() => {
             setDrawerVisible(false);
             setSelectedMonth(null);
+            fetchMaintenanceMonths();
           }}
           visible={drawerVisible}
           bodyStyle={{ paddingBottom: 80 }}
         >
-          {selectedMonth && (
-            <Tabs defaultActiveKey='1'>
-              <Tabs.TabPane tab='Expenses' key='1'>
-                <MaintenanceMonthExpenses maintenanceId={selectedMonth._id} />
-              </Tabs.TabPane>
-              <Tabs.TabPane tab='Maintenance Data' key='2'>
-                <MaintenanceDetails
-                  maintenanceData={selectedMonth.maintenanceData}
-                  id={selectedMonth._id}
-                />
-              </Tabs.TabPane>
-            </Tabs>
-          )}
+          <Tabs defaultActiveKey='1'>
+            <Tabs.TabPane tab='Expenses' key='1'>
+              <MaintenanceMonthExpenses maintenanceId={selectedMonth._id} />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab='Maintenance Data' key='2'>
+              <MaintenanceDetails
+                maintenanceData={selectedMonth.maintenanceData}
+                id={selectedMonth._id}
+              />
+            </Tabs.TabPane>
+          </Tabs>
         </Drawer>
       )}
-      {/* Modal for creating new month */}
+
       <Modal
         title='Create New Maintenance Month'
         visible={modalVisible}
@@ -203,7 +195,7 @@ const AdminPage = () => {
           <Form.Item
             name='amount'
             label='Maintenance Amount'
-            rules={[{ required: true, message: 'Please Enter valid amount' }]}
+            rules={[{ required: true, message: 'Please enter a valid amount' }]}
           >
             <Input placeholder='Amount' />
           </Form.Item>

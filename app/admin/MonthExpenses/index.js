@@ -8,14 +8,15 @@ import {
   Form,
   message,
   Card,
-  DatePicker
+  DatePicker,
+  Row,
+  Col
 } from 'antd';
 import { format } from 'date-fns';
 
 const addExpense = async (maintenanceId, expenseData) => {
   try {
     expenseData.expenseDate = format(expenseData.expenseDate, 'MMMM yyyy');
-    debugger;
     const response = await fetch(`/api/maintenances/${maintenanceId}`, {
       method: 'POST',
       headers: {
@@ -100,67 +101,86 @@ const ExpenseManager = ({ maintenanceId }) => {
   };
 
   return (
-    <div>
-      <h3 style={{ textAlign: 'right' }}>
+    <div className='p-4'>
+      {/* Total Expenses Display */}
+      <h3 className='text-right mb-4'>
         Total Expenses: {calculateTotalExpenses(expenses)}
       </h3>
-      <Card style={{ marginBottom: '1rem' }}>
+
+      {/* Expense Form */}
+      <Card className='mb-4'>
         <Form
           form={form}
           layout='inline'
           onFinish={handleAddExpense}
-          style={{ marginBottom: 12 }}
+          className='flex flex-wrap gap-4'
         >
-          <Form.Item
-            name='name'
-            rules={[
-              { required: true, message: 'Please enter the expense name' }
-            ]}
-          >
-            <Input
-              placeholder='Expense Name'
-              style={{ width: 150, marginRight: 5 }}
-            />
-          </Form.Item>
+          <Row gutter={[16, 16]} className='w-full'>
+            {/* Expense Name */}
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name='name'
+                rules={[
+                  { required: true, message: 'Please enter the expense name' }
+                ]}
+              >
+                <Input placeholder='Expense Name' className='w-full' />
+              </Form.Item>
+            </Col>
 
-          <Form.Item
-            name='amount'
-            rules={[{ required: true, message: 'Please enter the amount' }]}
-          >
-            <InputNumber
-              placeholder='Amount'
-              style={{ width: 100, marginRight: 5 }}
-              min={0}
-            />
-          </Form.Item>
+            {/* Expense Amount */}
+            <Col xs={24} sm={6}>
+              <Form.Item
+                name='amount'
+                rules={[{ required: true, message: 'Please enter the amount' }]}
+              >
+                <InputNumber placeholder='Amount' className='w-full' min={0} />
+              </Form.Item>
+            </Col>
 
-          <Form.Item
-            name='expenseDate'
-            rules={[{ required: true, message: 'Please select the date' }]}
-          >
-            <DatePicker picker='date' format='DD MMMM' />
-          </Form.Item>
+            {/* Expense Date */}
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name='expenseDate'
+                rules={[{ required: true, message: 'Please select the date' }]}
+              >
+                <DatePicker picker='date' format='DD MMMM' className='w-full' />
+              </Form.Item>
+            </Col>
 
-          <Form.Item>
-            <Button type='primary' htmlType='submit'>
-              Add Expense
-            </Button>
-          </Form.Item>
+            {/* Add Expense Button */}
+            <Col xs={24} sm={2}>
+              <Form.Item>
+                <Button
+                  type='primary'
+                  htmlType='submit'
+                  className='w-full sm:w-auto'
+                >
+                  Add Expense
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Card>
 
+      {/* Expense List */}
       <List
         bordered
         dataSource={expenses}
         renderItem={(expense) => (
           <List.Item
+            className='flex flex-wrap justify-between'
             actions={[
-              <Button danger onClick={() => handleDeleteExpense(expense._id)}>
+              <Button
+                danger
+                onClick={() => handleDeleteExpense(expense._id)}
+                className='mt-2 sm:mt-0'
+              >
                 Delete
               </Button>
             ]}
           >
-            {/* ₹ */}
             {expense.name}: {expense.amount}
           </List.Item>
         )}

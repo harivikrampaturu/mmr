@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Card, Typography, Radio, Input, Button } from 'antd';
+import React, { useState } from 'react';
+import { Card, Typography, Radio, Input, Button, Row, Col, message } from 'antd';
 import { MONTH_MAINTENANCE_DATA } from '@/app/constants';
 import axios from 'axios';
+import './styles.css';
 
 const MaintenanceDetails = ({ maintenanceData, id }) => {
   const [formData, setFormData] = useState(maintenanceData);
@@ -35,10 +36,11 @@ const MaintenanceDetails = ({ maintenanceData, id }) => {
           type: MONTH_MAINTENANCE_DATA,
           updateData: formData
         });
-
-        if (response.ok) {
+        if (response.status === 200) {
+          
           // Handle success, reset form modification flag
           setIsFormModified(false);
+          message.success('Saved successfully');
           console.log('Maintenance record added successfully.');
         } else {
           // Handle error
@@ -51,50 +53,62 @@ const MaintenanceDetails = ({ maintenanceData, id }) => {
   };
 
   return (
-    <div>
+    <div className='p-4'>
+      {/* Save Button */}
+      <div className='sticky-div'>
       <Button
         type='dashed'
-        className='mt-2'
+        className='mt-2 w-full sm:w-auto'
         disabled={!isFormModified}
         onClick={handleAddMaintenance}
       >
         Save Maintenance Record
       </Button>
-      {formData.map(({ payment, flatNo, comments }, index) => (
-        <Card key={index} className='m-1' size='small'>
-          <div className='flex items-center justify-between'>
-            <div
-              style={{
-                borderRadius: '50%',
-                padding: '0.5rem',
-                background:
-                  payment === 'pending'
-                    ? '#eee'
-                    : payment === 'paid'
-                    ? 'green'
-                    : 'orange'
-              }}
-            >
-              <Typography className='font-bold'>{flatNo}</Typography>
-            </div>
+      </div>
 
-            <div className='flex flex-col gap-middle'>
+      {/* Maintenance Details Cards */}
+      {formData.map(({ payment, flatNo, comments }, index) => (
+        <Card key={index} className='m-2' size='small'>
+          <Row gutter={[16, 16]} className='flex items-center justify-between'>
+            {/* Flat Number */}
+            <Col xs={24} sm={4} className='flex justify-center'>
+              <div
+                className='flex items-center justify-center rounded-full p-2'
+                style={{
+                  background:
+                    payment === 'pending'
+                      ? '#eee'
+                      : payment === 'paid'
+                      ? 'green'
+                      : 'orange'
+                }}
+              >
+                <Typography className='font-bold'>{flatNo}</Typography>
+              </div>
+            </Col>
+
+            {/* Payment Status */}
+            <Col xs={24} sm={10} className='flex justify-center'>
               <Radio.Group
                 options={['pending', 'partial', 'paid']}
                 defaultValue={payment}
                 optionType='button'
                 buttonStyle='solid'
                 onChange={(e) => handlePaymentChange(e.target.value, index)}
+                className='w-full sm:w-auto text-center'
               />
-            </div>
+            </Col>
 
-            <Input
-              className='w-40'
-              defaultValue={comments}
-              placeholder='Comments'
-              onChange={(e) => handleCommentChange(e, index)}
-            />
-          </div>
+            {/* Comments */}
+            <Col xs={24} sm={10} className='flex justify-center'>
+              <Input
+                className='w-full sm:w-40'
+                defaultValue={comments}
+                placeholder='Comments'
+                onChange={(e) => handleCommentChange(e, index)}
+              />
+            </Col>
+          </Row>
         </Card>
       ))}
     </div>

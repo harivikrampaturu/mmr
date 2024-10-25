@@ -6,6 +6,9 @@ import {
 import dbConnect from '@/lib/dbConnect';
 import Maintenance from '@/models/Maintenance';
 
+/*  import { db } from '@/lib/firebase'; 
+import { collection, addDoc } from 'firebase/firestore'; */
+
 // Function to generate maintenanceData for 50 flats
 const generateMaintenanceData = () => {
   let maintenanceData = [];
@@ -29,6 +32,15 @@ export async function POST(req) {
 
     const { monthName, amount, partialAmount } = await req.json();
 
+    // Check if a record with the same monthName already exists
+    const existingMaintenance = await Maintenance.findOne({ monthName });
+    if (existingMaintenance) {
+      return new Response(
+        JSON.stringify({ message: 'Record for this month already exists' }),
+        { status: 400 }
+      );
+    }
+
     // Generate maintenance data for 50 flats
     const maintenanceData = generateMaintenanceData();
 
@@ -41,9 +53,11 @@ export async function POST(req) {
     });
 
     await newMaintenance.save();
+
     return new Response(JSON.stringify(newMaintenance), { status: 201 });
   } catch (error) {
-    debugger;
+    console.log(error);
+
     return new Response(
       JSON.stringify({ message: 'Error creating new data', error }),
       { status: 500 }
