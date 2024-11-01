@@ -18,7 +18,6 @@ import { format } from 'date-fns';
 
 const addExpense = async (maintenanceId, expenseData) => {
   try {
-    expenseData.expenseDate = format(expenseData.expenseDate, 'MMMM yyyy');
     const response = await fetch(`/api/maintenances/${maintenanceId}`, {
       method: 'POST',
       headers: {
@@ -171,18 +170,19 @@ const ExpenseManager = ({ maintenanceId }) => {
         dataSource={expenses}
         renderItem={(expense) => (
           <List.Item
-            className='flex flex-wrap justify-between'
+            className='flex flex-wrap justify-between items-center'
             actions={[
               <Button
                 danger
                 onClick={() => handleDeleteExpense(expense._id)}
-                className='mt-2 sm:mt-0'
+                className='px-2 pb-1'
               >
                 Delete
               </Button>
             ]}
           >
-            {expense.name}: {expense.amount}
+            {expense.name}: Rs.{expense.amount} |{' '}
+            {format(new Date(expense.expenseDate), 'dd MMM')}
           </List.Item>
         )}
       />
