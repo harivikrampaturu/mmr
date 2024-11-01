@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase'; // Ensure firebase config is correct
 import axios from 'axios';
+
 import {
   Table,
   Button,
@@ -156,9 +157,16 @@ const AdminPage = () => {
   };
 
   const columns = [
-    { title: 'Month Name', dataIndex: 'monthName', key: 'monthName' },
+    {
+      title: 'Month Name',
+      dataIndex: 'monthName',
+      key: 'monthName',
+      ellipsis: true,
+      className: 'w-36'
+    },
     {
       title: 'Total Maintenance',
+      className: 'hidden md:table-cell',
       render: (text, record) => (
         <span>
           {calculateTotalMaintenance(record?.maintenanceData, {
@@ -170,6 +178,7 @@ const AdminPage = () => {
     },
     {
       title: 'Total Expenses',
+      className: 'hidden md:table-cell',
       render: (text, record) => (
         <span>{calculateTotalExpenses(record?.expenses)}</span>
       )
@@ -210,7 +219,9 @@ const AdminPage = () => {
     <div className='container mx-auto p-4'>
       <div className='flex flex-row items-center justify-between'>
         <div>
-          <h1 className='text-xl font-bold mb-4'>Apartment Maintenance</h1>
+          <h1 className='text-xl font-bold mb-4 hidden md:block'>
+            Apartment Maintenance
+          </h1>
           <Button
             type='primary'
             icon={<PlusOutlined />}
@@ -224,14 +235,15 @@ const AdminPage = () => {
           <Logout />
         </div>
       </div>
-
-      <Table
-        dataSource={months}
-        columns={columns}
-        loading={loading}
-        rowKey='_id'
-        pagination={{ pageSize: 5 }}
-      />
+      <div className='overflow-x-auto text-sm sm:text-base'>
+        <Table
+          dataSource={months}
+          columns={columns}
+          loading={loading}
+          rowKey='_id'
+          pagination={{ pageSize: 5 }}
+        />
+      </div>
 
       {selectedMonth && (
         <Drawer
