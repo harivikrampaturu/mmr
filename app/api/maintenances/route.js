@@ -30,7 +30,13 @@ export async function POST(req) {
   try {
     await dbConnect();
 
-    const { monthName, amount, partialAmount } = await req.json();
+    const {
+      monthName,
+      amount,
+      partialAmount,
+      openingBalance = 0,
+      additionalIncome = 0
+    } = await req.json();
 
     // Check if a record with the same monthName already exists
     const existingMaintenance = await Maintenance.findOne({ monthName });
@@ -47,6 +53,8 @@ export async function POST(req) {
     const newMaintenance = new Maintenance({
       monthName,
       amount,
+      openingBalance,
+      additionalIncome,
       partialAmount,
       maintenanceData,
       expenses: []
@@ -95,8 +103,13 @@ export async function PUT(req) {
     const { id, type, updateData } = await req.json(); // Expect id, type, and updateData in request
 
     let updatedData;
-
-    if (type === MONTH_MAINTENANCE_DATA) {
+    if (type === 'MONTH_UPDATE') {
+      updatedData = await Maintenance.findByIdAndUpdate(
+        id,
+        updateData, // Only updating fields in `maintenanceSchema`
+        { new: true }
+      );
+    } else if (type === MONTH_MAINTENANCE_DATA) {
       // Update maintenanceData
       updatedData = await Maintenance.findByIdAndUpdate(
         id,

@@ -15,12 +15,17 @@ import {
   DatePicker,
   message
 } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import {
+  FileExcelOutlined,
+  FilePdfOutlined,
+  PlusOutlined
+} from '@ant-design/icons';
 import { format } from 'date-fns';
 import MaintenanceMonthExpenses from './MonthExpenses';
 import MaintenanceDetails from './MaintenanceDetails';
 import { PAYMENT_PAID, PAYMENT_PARTIAL, PAYMENT_PENDING } from '../constants';
 import Logout from '../common/components/Logout';
+import UpdateMonth from './UpdateMonth';
 
 const AdminPage = () => {
   const [months, setMonths] = useState([]);
@@ -41,6 +46,59 @@ const AdminPage = () => {
 
     return () => unsubscribe();
   }, [router]);
+
+  const downloadStatement = async (monthName) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `/api/maintenances/download?monthName=${monthName}`
+      );
+      if (!response.ok) {
+        console.error('Failed to download statement');
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${monthName}-Maintenance-Statement.pdf`;
+      link.click();
+      setLoading(false);
+    } catch (error) {
+      console.error('Error downloading statement:', error);
+      setLoading(false);
+    }
+  };
+
+  const downloadExcel = async (monthName) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `/api/maintenances/summary?monthName=${monthName}`,
+        {
+          responseType: 'blob' // Important to handle binary data
+        }
+      );
+
+      // Create a URL for the blob and initiate a download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${monthName}-Maintenance-Statement.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up the URL and link
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error downloading Excel file:', error);
+      alert('There was an issue downloading the file. Please try again.');
+      setLoading(false);
+    }
+  };
 
   // Fetch maintenance months data
   const fetchMaintenanceMonths = async () => {
@@ -66,6 +124,7 @@ const AdminPage = () => {
       values.monthName = format(values.monthName, 'MMMM yyyy');
       values.amount = Number(values.amount);
       values.partialAmount = Number(values.partialAmount);
+      values.openingBalance = Number(values.openingBalance);
       await axios.post('/api/maintenances', values);
       message.success('Maintenance month created successfully!');
       setModalVisible(false);
@@ -118,9 +177,31 @@ const AdminPage = () => {
     {
       title: 'Actions',
       render: (text, record) => (
-        <Button type='primary' onClick={() => handleViewMonth(record)}>
-          View
-        </Button>
+        <>
+          <Button
+            type='default'
+            onClick={() => {
+              downloadExcel(record.monthName);
+            }}
+            title='Download Excel'
+            className='ml-2 mr-2'
+          >
+            <FileExcelOutlined />
+          </Button>
+          <Button
+            type='default'
+            title='Download PDF'
+            onClick={() => {
+              downloadStatement(record.monthName);
+            }}
+            className='ml-2 mr-2 hidden'
+          >
+            <FilePdfOutlined />
+          </Button>
+          <Button type='primary' onClick={() => handleViewMonth(record)}>
+            View
+          </Button>
+        </>
       )
     }
   ];
@@ -174,6 +255,9 @@ const AdminPage = () => {
                 id={selectedMonth._id}
               />
             </Tabs.TabPane>
+            <Tabs.TabPane tab='Settings' key='3'>
+              <UpdateMonth id={selectedMonth._id} />
+            </Tabs.TabPane>
           </Tabs>
         </Drawer>
       )}
@@ -192,6 +276,7 @@ const AdminPage = () => {
           >
             <DatePicker picker='month' format='MMMM yyyy' />
           </Form.Item>
+
           <Form.Item
             name='amount'
             label='Maintenance Amount'
@@ -201,6 +286,9 @@ const AdminPage = () => {
           </Form.Item>
           <Form.Item name='partialAmount' label='Partial Amount'>
             <Input placeholder='Partial Amount' />
+          </Form.Item>
+          <Form.Item name='openingBalance' label='Opening Balance'>
+            <Input placeholder='Opening Balance' />
           </Form.Item>
         </Form>
       </Modal>

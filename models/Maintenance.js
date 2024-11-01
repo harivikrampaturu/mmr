@@ -9,7 +9,8 @@ const maintenanceDataSchema = new mongoose.Schema({
 const expenseSchema = new mongoose.Schema({
   name: String,
   amount: Number,
-  expenseDate: String
+  expenseDate: String,
+  bill: Boolean
 });
 
 const maintenanceSchema = new mongoose.Schema(
@@ -17,6 +18,8 @@ const maintenanceSchema = new mongoose.Schema(
     monthName: String,
     amount: Number,
     partialAmount: Number,
+    openingBalance: Number,
+    additionalIncome: Number,
     maintenanceData: [maintenanceDataSchema],
     expenses: [expenseSchema]
   },

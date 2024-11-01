@@ -10,7 +10,9 @@ import {
   Card,
   DatePicker,
   Row,
-  Col
+  Col,
+  Radio,
+  Switch
 } from 'antd';
 import { format } from 'date-fns';
 
@@ -85,6 +87,8 @@ const ExpenseManager = ({ maintenanceId }) => {
   }, [maintenanceId]);
 
   const handleAddExpense = async (values) => {
+    // Convert the selected date to ISO string format
+    values.expenseDate = values.expenseDate.toISOString();
     const updatedMaintenance = await addExpense(maintenanceId, values);
     if (updatedMaintenance) {
       setExpenses(updatedMaintenance.expenses);
@@ -102,65 +106,62 @@ const ExpenseManager = ({ maintenanceId }) => {
 
   return (
     <div className='p-4'>
-      {/* Total Expenses Display */}
-      <h3 className='text-right mb-4'>
-        Total Expenses: {calculateTotalExpenses(expenses)}
-      </h3>
-
       {/* Expense Form */}
       <Card className='mb-4'>
         <Form
           form={form}
-          layout='inline'
+          layout='vertical' // Changed layout to vertical
           onFinish={handleAddExpense}
-          className='flex flex-wrap gap-4'
+          initialValues={{ bill: false }}
+          className='flex flex-wrap  flex-col'
         >
-          <Row gutter={[16, 16]} className='w-full'>
+          <div className='flex flex-wrap justify-between '>
             {/* Expense Name */}
-            <Col xs={24} sm={8}>
-              <Form.Item
-                name='name'
-                rules={[
-                  { required: true, message: 'Please enter the expense name' }
-                ]}
-              >
-                <Input placeholder='Expense Name' className='w-full' />
-              </Form.Item>
-            </Col>
-
+            <Form.Item
+              name='name'
+              label='Expense Name'
+              rules={[
+                { required: true, message: 'Please enter the expense name' }
+              ]}
+              className='flex-1'
+            >
+              <Input placeholder='Expense Name' className='w-full' />
+            </Form.Item>
             {/* Expense Amount */}
-            <Col xs={24} sm={6}>
-              <Form.Item
-                name='amount'
-                rules={[{ required: true, message: 'Please enter the amount' }]}
-              >
-                <InputNumber placeholder='Amount' className='w-full' min={0} />
-              </Form.Item>
-            </Col>
+            <Form.Item
+              name='amount'
+              label='Amount'
+              rules={[{ required: true, message: 'Please enter the amount' }]}
+            >
+              <InputNumber placeholder='Amount' className='w-full' min={0} />
+            </Form.Item>
+          </div>
 
+          <div className='flex flex-wrap justify-between '>
             {/* Expense Date */}
-            <Col xs={24} sm={8}>
-              <Form.Item
-                name='expenseDate'
-                rules={[{ required: true, message: 'Please select the date' }]}
-              >
-                <DatePicker picker='date' format='DD MMMM' className='w-full' />
-              </Form.Item>
-            </Col>
-
-            {/* Add Expense Button */}
-            <Col xs={24} sm={2}>
-              <Form.Item>
-                <Button
-                  type='primary'
-                  htmlType='submit'
-                  className='w-full sm:w-auto'
-                >
-                  Add Expense
-                </Button>
-              </Form.Item>
-            </Col>
-          </Row>
+            <Form.Item
+              name='expenseDate'
+              label='Expense Date'
+              rules={[{ required: true, message: 'Please select the date' }]}
+              className='flex-1'
+            >
+              <DatePicker picker='date' format='DD MMMM' className='w-full' />
+            </Form.Item>
+            <Form.Item
+              name='bill'
+              label='Bill'
+              rules={[{ required: true, message: 'Please select an option' }]}
+              value='NA'
+            >
+              <Switch checkedChildren='A' unCheckedChildren='NA' />
+            </Form.Item>
+          </div>
+          {/* Add Expense Button */}
+          <Form.Item>
+            <Button type='primary' htmlType='submit' className='w-full'>
+              Add Expense
+            </Button>
+          </Form.Item>
         </Form>
       </Card>
 
@@ -185,6 +186,10 @@ const ExpenseManager = ({ maintenanceId }) => {
           </List.Item>
         )}
       />
+      {/* Total Expenses Display */}
+      <h3 className='text-right mb-4'>
+        Total Expenses: {calculateTotalExpenses(expenses)}
+      </h3>
     </div>
   );
 };
