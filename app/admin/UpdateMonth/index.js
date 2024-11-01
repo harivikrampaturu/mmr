@@ -51,18 +51,18 @@ const UpdateMonth = ({ id }) => {
       }}
     >
       <Form.Item
-        label='Amount'
+        label='Maintenance Amount (Occupied flats)'
         name='amount'
         rules={[{ required: true, message: 'Please enter the amount' }]}
       >
-        <InputNumber min={0} />
+        <InputNumber min={0} className='w-full' />
       </Form.Item>
       <Form.Item
-        label='Partial Amount'
+        label='Partial Amount (Unoccupied flats)'
         name='partialAmount'
         rules={[{ required: true, message: 'Please enter the partial amount' }]}
       >
-        <InputNumber min={0} />
+        <InputNumber min={0} className='w-full' />
       </Form.Item>
       <Form.Item
         label='Opening Balance'
@@ -71,7 +71,7 @@ const UpdateMonth = ({ id }) => {
           { required: true, message: 'Please enter the opening balance' }
         ]}
       >
-        <InputNumber min={0} />
+        <InputNumber min={0} className='w-full' />
       </Form.Item>
       <Form.Item
         label='Additional Income'
@@ -80,7 +80,7 @@ const UpdateMonth = ({ id }) => {
           { required: true, message: 'Please enter the additional income' }
         ]}
       >
-        <InputNumber min={0} />
+        <InputNumber min={0} className='w-full' />
       </Form.Item>
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={loading}>

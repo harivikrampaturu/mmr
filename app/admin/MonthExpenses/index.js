@@ -4,15 +4,12 @@ import {
   Input,
   InputNumber,
   Button,
-  List,
   Form,
   message,
   Card,
   DatePicker,
-  Row,
-  Col,
-  Radio,
-  Switch
+  Switch,
+  Table
 } from 'antd';
 import { format } from 'date-fns';
 
@@ -84,6 +81,47 @@ const ExpenseManager = ({ maintenanceId }) => {
 
     fetchExpenses();
   }, [maintenanceId]);
+
+  const ExpenseTable = ({ expenses, handleDeleteExpense }) => {
+    const columns = [
+      {
+        title: 'Expense Name',
+        dataIndex: 'name',
+        key: 'name'
+      },
+      {
+        title: 'Amount (Rs.)',
+        dataIndex: 'amount',
+        key: 'amount'
+      },
+      {
+        title: 'Date',
+        dataIndex: 'expenseDate',
+        key: 'expenseDate',
+        render: (date) => format(new Date(date), 'dd MMM')
+      },
+      {
+        title: 'Action',
+        key: 'action',
+        align: 'center',
+        render: (_, record) => (
+          <Button danger onClick={() => handleDeleteExpense(record._id)}>
+            Delete
+          </Button>
+        )
+      }
+    ];
+
+    return (
+      <Table
+        bordered
+        dataSource={expenses}
+        columns={columns}
+        rowKey='_id'
+        pagination={false}
+      />
+    );
+  };
 
   const handleAddExpense = async (values) => {
     // Convert the selected date to ISO string format
@@ -165,26 +203,9 @@ const ExpenseManager = ({ maintenanceId }) => {
       </Card>
 
       {/* Expense List */}
-      <List
-        bordered
-        dataSource={expenses}
-        renderItem={(expense) => (
-          <List.Item
-            className='flex flex-wrap justify-between items-center'
-            actions={[
-              <Button
-                danger
-                onClick={() => handleDeleteExpense(expense._id)}
-                className='px-2 pb-1'
-              >
-                Delete
-              </Button>
-            ]}
-          >
-            {expense.name}: Rs.{expense.amount} |{' '}
-            {format(new Date(expense.expenseDate), 'dd MMM')}
-          </List.Item>
-        )}
+      <ExpenseTable
+        expenses={expenses}
+        handleDeleteExpense={handleDeleteExpense}
       />
       {/* Total Expenses Display */}
       <h3 className='text-right mb-4'>

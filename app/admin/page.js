@@ -291,12 +291,15 @@ const AdminPage = () => {
 
           <Form.Item
             name='amount'
-            label='Maintenance Amount'
+            label='Maintenance Amount (Occupied Flats)'
             rules={[{ required: true, message: 'Please enter a valid amount' }]}
           >
             <Input placeholder='Amount' />
           </Form.Item>
-          <Form.Item name='partialAmount' label='Partial Amount'>
+          <Form.Item
+            name='partialAmount'
+            label='Partial Amount (Unoccupied Flats)'
+          >
             <Input placeholder='Partial Amount' />
           </Form.Item>
           <Form.Item name='openingBalance' label='Opening Balance'>
