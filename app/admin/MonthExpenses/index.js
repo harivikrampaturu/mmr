@@ -101,6 +101,12 @@ const ExpenseManager = ({ maintenanceId }) => {
         render: (date) => format(new Date(date), 'dd MMM')
       },
       {
+        title: 'Bill',
+        dataIndex: 'bill',
+        key: 'bill',
+        render: (bill) => (Boolean(bill) ? 'A' : 'NA')
+      },
+      {
         title: 'Action',
         key: 'action',
         align: 'center',
