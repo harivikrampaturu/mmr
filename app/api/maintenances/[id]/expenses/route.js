@@ -1,14 +1,17 @@
 // app/api/expense/[id]/route.js
 import dbConnect from '@/lib/dbConnect';
+import { authenticate } from '@/lib/middleware';
 import Maintenance from '@/models/Maintenance';
 import mongoose from 'mongoose';
 
 // GET: Fetch a specific expense by ID
 export async function GET(request, { params }) {
+  const authResponse = await authenticate(request);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
   await dbConnect();
   const { id } = params;
-
-  console.log('came here tooooooo');
 
   // Find the specific expense within the Maintenance collection
   const maintenance = await Maintenance.findOne({
@@ -25,6 +28,10 @@ export async function GET(request, { params }) {
 
 // PUT: Update a specific expense by ID
 export async function PUT(request, { params }) {
+  const authResponse = await authenticate(request);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
   await dbConnect();
   const { id } = params;
   const updatedExpenseData = await request.json();
@@ -46,11 +53,13 @@ export async function PUT(request, { params }) {
 
 // DELETE: Delete a specific expense by ID
 export async function DELETE(request, { params }) {
+  const authResponse = await authenticate(request);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
   await dbConnect();
 
   const { eid } = await request.json();
-
-  console.log(' came to delete here');
 
   const maintenance = await Maintenance.findOneAndUpdate(
     { 'expenses._id': new mongoose.Types.ObjectId(eid) },

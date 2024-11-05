@@ -1,7 +1,7 @@
 // components/MaintenanceForm.js
 import { useState, useEffect } from 'react';
 import { Form, Input, InputNumber, Button, message } from 'antd';
-import axios from 'axios';
+import axiosApi from '@/utils/axios';
 
 const UpdateMonth = ({ id }) => {
   const [form] = Form.useForm();
@@ -10,7 +10,7 @@ const UpdateMonth = ({ id }) => {
   // Fetch existing data if updating
   useEffect(() => {
     if (id) {
-      axios
+      axiosApi
         .get(`/api/maintenances/${id}`)
         .then(({ data }) => form.setFieldsValue(data))
         .catch(() => message.error('Failed to load data'));
@@ -24,7 +24,7 @@ const UpdateMonth = ({ id }) => {
       const type = id ? 'MONTH_UPDATE' : 'MONTH_MAINTENANCE_DATA';
       const updateData = { ...values };
 
-      await axios.put('/api/maintenances', {
+      await axiosApi.put('/api/maintenances', {
         id,
         type,
         updateData

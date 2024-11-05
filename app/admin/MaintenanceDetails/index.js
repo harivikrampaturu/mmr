@@ -1,9 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Typography, Radio, Input, Button, Row, Col, message } from 'antd';
+import {
+  Card,
+  Typography,
+  Radio,
+  Input,
+  Button,
+  Row,
+  Col,
+  message
+} from 'antd';
 import { MONTH_MAINTENANCE_DATA } from '@/app/constants';
-import axios from 'axios';
+import axiosApi from '@/utils/axios';
 import './styles.css';
 
 const MaintenanceDetails = ({ maintenanceData, id }) => {
@@ -31,13 +40,12 @@ const MaintenanceDetails = ({ maintenanceData, id }) => {
   const handleAddMaintenance = async () => {
     if (isFormModified) {
       try {
-        const response = await axios.put('/api/maintenances', {
+        const response = await axiosApi.put('/api/maintenances', {
           id,
           type: MONTH_MAINTENANCE_DATA,
           updateData: formData
         });
         if (response.status === 200) {
-          
           // Handle success, reset form modification flag
           setIsFormModified(false);
           message.success('Saved successfully');
@@ -56,14 +64,14 @@ const MaintenanceDetails = ({ maintenanceData, id }) => {
     <div className='p-4'>
       {/* Save Button */}
       <div className='sticky-div'>
-      <Button
-        type='dashed'
-        className='mt-2 w-full sm:w-auto'
-        disabled={!isFormModified}
-        onClick={handleAddMaintenance}
-      >
-        Save Maintenance Record
-      </Button>
+        <Button
+          type='dashed'
+          className='mt-2 w-full sm:w-auto'
+          disabled={!isFormModified}
+          onClick={handleAddMaintenance}
+        >
+          Save Maintenance Record
+        </Button>
       </div>
 
       {/* Maintenance Details Cards */}

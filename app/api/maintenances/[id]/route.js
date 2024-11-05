@@ -1,12 +1,15 @@
 // app/api/expense/route.js
 import dbConnect from '@/lib/dbConnect';
+import { authenticate } from '@/lib/middleware';
 import Maintenance from '@/models/Maintenance';
 
 export async function POST(request) {
+  const authResponse = await authenticate(request);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
   await dbConnect();
   const { maintenanceId, expense } = await request.json();
-
-  console.log('===> expense', expense);
 
   // Find the specific Maintenance document by ID and push the new expense into the array
   const updatedMaintenance = await Maintenance.findByIdAndUpdate(
@@ -23,9 +26,13 @@ export async function POST(request) {
 }
 
 export async function GET(req, { params }) {
+  const authResponse = await authenticate(req);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
+
   const { id } = params;
 
-  console.log('ider aaaaya ', id);
   try {
     await dbConnect(); // Connect to your MongoDB database
 

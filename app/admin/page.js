@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/firebase'; // Ensure firebase config is correct
-import axios from 'axios';
+import { useState, useEffect } from 'react'; // Ensure firebase config is correct
+import axiosApi from '@/utils/axios';
 
 import {
   Table,
@@ -14,7 +12,8 @@ import {
   Input,
   Modal,
   DatePicker,
-  message
+  message,
+  Skeleton
 } from 'antd';
 import {
   FileExcelOutlined,
@@ -30,23 +29,11 @@ import UpdateMonth from './UpdateMonth';
 
 const AdminPage = () => {
   const [months, setMonths] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
-
-  const router = useRouter();
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        router.push('/login'); // Ensure proper user session handling
-      }
-    });
-
-    return () => unsubscribe();
-  }, [router]);
 
   const downloadStatement = async (monthName) => {
     try {
@@ -75,7 +62,7 @@ const AdminPage = () => {
   const downloadExcel = async (monthName) => {
     try {
       setLoading(true);
-      const response = await axios.get(
+      const response = await axiosApi.get(
         `/api/maintenances/summary?monthName=${monthName}`,
         {
           responseType: 'blob' // Important to handle binary data
@@ -105,7 +92,7 @@ const AdminPage = () => {
   const fetchMaintenanceMonths = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/maintenances');
+      const response = await axiosApi.get('/api/maintenances');
       setMonths(response?.data?.data.reverse());
     } catch (error) {
       console.error('Failed to fetch maintenance months:', error);
@@ -126,7 +113,7 @@ const AdminPage = () => {
       values.amount = Number(values.amount);
       values.partialAmount = Number(values.partialAmount);
       values.openingBalance = Number(values.openingBalance);
-      await axios.post('/api/maintenances', values);
+      await axiosApi.post('/api/maintenances', values);
       message.success('Maintenance month created successfully!');
       setModalVisible(false);
       form.resetFields();
@@ -161,8 +148,7 @@ const AdminPage = () => {
       title: 'Month Name',
       dataIndex: 'monthName',
       key: 'monthName',
-      ellipsis: true,
-      className: 'w-36'
+      ellipsis: true
     },
     {
       title: 'Total Maintenance',
@@ -186,17 +172,16 @@ const AdminPage = () => {
     {
       title: 'Actions',
       render: (text, record) => (
-        <>
+        <div className='flex items-center'>
           <Button
             type='default'
             onClick={() => {
               downloadExcel(record.monthName);
             }}
             title='Download Excel'
-            className='ml-2 mr-2'
-          >
-            <FileExcelOutlined />
-          </Button>
+            icon={<FileExcelOutlined />}
+            size={'middle'}
+          />
           <Button
             type='default'
             title='Download PDF'
@@ -207,16 +192,22 @@ const AdminPage = () => {
           >
             <FilePdfOutlined />
           </Button>
-          <Button type='primary' onClick={() => handleViewMonth(record)}>
+          <Button
+            type='primary'
+            className='ml-2'
+            onClick={() => handleViewMonth(record)}
+          >
             View
           </Button>
-        </>
+        </div>
       )
     }
   ];
 
+  if (loading) return <Skeleton />;
+
   return (
-    <div className='container mx-auto p-4'>
+    <div className='mx-auto p-2 pr-4 pl-4'>
       <div className='flex flex-row items-center justify-between'>
         <div>
           <h1 className='text-xl font-bold mb-4 hidden md:block'>
@@ -235,7 +226,7 @@ const AdminPage = () => {
           <Logout />
         </div>
       </div>
-      <div className='overflow-x-auto text-sm sm:text-base'>
+      <div className='overflow-x-auto '>
         <Table
           dataSource={months}
           columns={columns}
@@ -291,14 +282,14 @@ const AdminPage = () => {
 
           <Form.Item
             name='amount'
-            label='Maintenance Amount (Occupied Flats)'
+            label='Maintenance Amount per Flat (Occupied)'
             rules={[{ required: true, message: 'Please enter a valid amount' }]}
           >
             <Input placeholder='Amount' />
           </Form.Item>
           <Form.Item
             name='partialAmount'
-            label='Partial Amount (Unoccupied Flats)'
+            label='Partial Amount per Flat (Unoccupied)'
           >
             <Input placeholder='Partial Amount' />
           </Form.Item>

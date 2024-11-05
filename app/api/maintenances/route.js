@@ -4,6 +4,7 @@ import {
   PAYMENT_PENDING
 } from '@/app/constants';
 import dbConnect from '@/lib/dbConnect';
+import { authenticate } from '@/lib/middleware';
 import Maintenance from '@/models/Maintenance';
 
 /*  import { db } from '@/lib/firebase'; 
@@ -27,6 +28,11 @@ const generateMaintenanceData = () => {
 };
 
 export async function POST(req) {
+  const authResponse = await authenticate(req);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
+
   try {
     await dbConnect();
 
@@ -73,7 +79,12 @@ export async function POST(req) {
   }
 }
 
-export async function GET() {
+export async function GET(req) {
+  const authResponse = await authenticate(req);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
+
   try {
     await dbConnect();
     const maintenanceData = await Maintenance.find({});
@@ -97,6 +108,10 @@ export async function GET() {
 }
 
 export async function PUT(req) {
+  const authResponse = await authenticate(req);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
   try {
     await dbConnect();
 

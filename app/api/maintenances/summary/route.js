@@ -2,8 +2,14 @@ import dbConnect from '@/lib/dbConnect';
 import MaintenanceModel from '@/models/Maintenance';
 import ExcelJS from 'exceljs';
 import { format } from 'date-fns';
+import { authenticate } from '@/lib/middleware';
 
 export async function GET(request) {
+  const authResponse = await authenticate(request);
+  if (authResponse instanceof Response && authResponse.status === 401) {
+    return authResponse;
+  }
+
   await dbConnect();
 
   const url = new URL(request.url);
