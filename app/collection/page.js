@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import {
@@ -279,4 +279,10 @@ const CollectionPage = () => {
   );
 };
 
-export default CollectionPage;
+const CollectionPageWithSuspense = () => (
+  <Suspense fallback={<Spin tip='Loading page...' />}>
+    <CollectionPage />
+  </Suspense>
+);
+
+export default CollectionPageWithSuspense;
