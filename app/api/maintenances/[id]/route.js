@@ -26,8 +26,15 @@ export async function POST(request) {
 }
 
 export async function GET(req, { params }) {
+  const url = new URL(req.url);
+  const inCollection = url.searchParams.get('inCollection') || false;
+
   const authResponse = await authenticate(req);
-  if (authResponse instanceof Response && authResponse.status === 401) {
+  if (
+    authResponse instanceof Response &&
+    authResponse.status === 401 &&
+    !Boolean(inCollection)
+  ) {
     return authResponse;
   }
 

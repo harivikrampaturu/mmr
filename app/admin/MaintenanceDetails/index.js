@@ -75,7 +75,7 @@ const MaintenanceDetails = ({ maintenanceData, id }) => {
       </div>
 
       {/* Maintenance Details Cards */}
-      {formData.map(({ payment, flatNo, comments }, index) => (
+      {formData.map(({ payment, flatNo, comments, _id, status }, index) => (
         <Card key={index} className='m-2' size='small'>
           <Row gutter={[16, 16]} className='flex items-center justify-between'>
             {/* Flat Number */}

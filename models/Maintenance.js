@@ -3,14 +3,17 @@ import mongoose from 'mongoose';
 const maintenanceDataSchema = new mongoose.Schema({
   flatNo: Number,
   payment: String,
-  comments: String
+  comments: String,
+  date: String,
+  status: String
 });
 
 const expenseSchema = new mongoose.Schema({
   name: String,
   amount: Number,
   expenseDate: String,
-  bill: Boolean
+  bill: Boolean,
+  billNumber: String
 });
 
 const maintenanceSchema = new mongoose.Schema(

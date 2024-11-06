@@ -1,29 +1,60 @@
-// app/api/expense/[id]/route.js
+// app/api/maintenances/[id]/expenses/route.js
 import dbConnect from '@/lib/dbConnect';
 import { authenticate } from '@/lib/middleware';
 import Maintenance from '@/models/Maintenance';
 import mongoose from 'mongoose';
+import { NextResponse } from 'next/server';
 
 // GET: Fetch a specific expense by ID
 export async function GET(request, { params }) {
   const authResponse = await authenticate(request);
+
+  // If the authentication fails (returns a response with 401), return that response
   if (authResponse instanceof Response && authResponse.status === 401) {
-    return authResponse;
-  }
-  await dbConnect();
-  const { id } = params;
-
-  // Find the specific expense within the Maintenance collection
-  const maintenance = await Maintenance.findOne({
-    'expenses._id': mongoose.Types.ObjectId(id)
-  });
-
-  if (!maintenance) {
-    return new Response('Expense not found', { status: 404 });
+    return authResponse; // Return the authentication failure response
   }
 
-  const expense = maintenance.expenses.id(id);
-  return new Response(JSON.stringify(expense), { status: 200 });
+  await dbConnect(); // Ensure you are connected to the database
+  const { id } = params; // Get the ID from the request parameters
+
+  try {
+    // Log the incoming ID for debugging
+    console.log(`Fetching expense for expense ID: ${id}`);
+
+    // Find the specific maintenance document that contains the expense
+    const maintenance = await Maintenance.findOne({
+      'expenses._id': new mongoose.Types.ObjectId(id) // Ensure to create ObjectId correctly
+    });
+
+    if (!maintenance) {
+      console.error(`Maintenance not found for expense ID: ${id}`);
+      return NextResponse.json(
+        { message: 'Maintenance not found' },
+        { status: 404 }
+      );
+    }
+
+    // Get the specific expense by its ID
+    const expense = maintenance.expenses.id(id); // Use the correct id to get the specific expense
+
+    // If the expense is not found, return a 404 response
+    if (!expense) {
+      console.error(`Expense not found for ID: ${id}`);
+      return NextResponse.json(
+        { message: 'Expense not found' },
+        { status: 404 }
+      );
+    }
+
+    // Return the expense as JSON
+    return NextResponse.json(expense, { status: 200 });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
 }
 
 // PUT: Update a specific expense by ID
@@ -33,11 +64,12 @@ export async function PUT(request, { params }) {
     return authResponse;
   }
   await dbConnect();
-  const { id } = params;
+
+  const { id } = params; // Ensure you are getting the correct expense ID from params
   const updatedExpenseData = await request.json();
 
   const maintenance = await Maintenance.findOneAndUpdate(
-    { 'expenses._id': mongoose.Types.ObjectId(id) },
+    { 'expenses._id': mongoose.Types.ObjectId(id) }, // Correctly use the expense ID
     {
       $set: { 'expenses.$': updatedExpenseData }
     },
@@ -45,10 +77,15 @@ export async function PUT(request, { params }) {
   );
 
   if (!maintenance) {
-    return new Response('Expense not found', { status: 404 });
+    return NextResponse.json(
+      { message: 'Maintenance not found' },
+      { status: 404 }
+    );
   }
 
-  return new Response(JSON.stringify(maintenance), { status: 200 });
+  // Optionally return the updated expense
+  const updatedExpense = maintenance.expenses.id(id);
+  return NextResponse.json(updatedExpense, { status: 200 });
 }
 
 // DELETE: Delete a specific expense by ID
@@ -59,17 +96,17 @@ export async function DELETE(request, { params }) {
   }
   await dbConnect();
 
-  const { eid } = await request.json();
+  const { id } = params; // Get the expense ID from params
 
   const maintenance = await Maintenance.findOneAndUpdate(
-    { 'expenses._id': new mongoose.Types.ObjectId(eid) },
-    { $pull: { expenses: { _id: new mongoose.Types.ObjectId(eid) } } },
+    { 'expenses._id': mongoose.Types.ObjectId(id) }, // Use the correct expense ID
+    { $pull: { expenses: { _id: mongoose.Types.ObjectId(id) } } }, // Pull the expense from the expenses array
     { new: true }
   );
 
   if (!maintenance) {
-    return new Response('Expense not found', { status: 404 });
+    return NextResponse.json({ message: 'Expense not found' }, { status: 404 });
   }
 
-  return new Response('Expense deleted', { status: 200 });
+  return NextResponse.json({ message: 'Expense deleted' }, { status: 200 });
 }

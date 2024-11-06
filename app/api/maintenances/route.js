@@ -1,7 +1,8 @@
 import {
   MONTH_EXPENSES,
   MONTH_MAINTENANCE_DATA,
-  PAYMENT_PENDING
+  PAYMENT_PENDING,
+  STATUS_INITIAL
 } from '@/app/constants';
 import dbConnect from '@/lib/dbConnect';
 import { authenticate } from '@/lib/middleware';
@@ -19,7 +20,9 @@ const generateMaintenanceData = () => {
       maintenanceData.push({
         flatNo: floor * 100 + flat,
         payment: PAYMENT_PENDING, // Default amount
-        comments: '' // Default comments
+        comments: '', // Default comments
+        date: '',
+        status: STATUS_INITIAL
       });
     }
   }
