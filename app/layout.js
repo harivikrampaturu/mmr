@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Link from 'next/link';
+import Head from 'next/head';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
@@ -13,6 +14,13 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang='en'>
+      <Head>
+        {/* Import Google Fonts here */}
+        <link
+          href='https://fonts.googleapis.com/css2?family=Bangers&display=swap'
+          rel='stylesheet'
+        />
+      </Head>
       <body className={inter.className}>
         {' '}
         <header className='px-4 lg:px-6 h-14 flex items-center justify-between bg-white drop-shadow-sm'>

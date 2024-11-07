@@ -34,6 +34,7 @@ import { getFormatedMonthName } from '@/utils/helpers';
 import { ClockCircleOutlined, PayCircleOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
+const { Title } = Typography;
 import SignatureCanvas from 'react-signature-canvas';
 
 const CollectionPage = () => {
@@ -104,7 +105,7 @@ const CollectionPage = () => {
       if (values.payment === PAYMENT_PENDING)
         throw new Error('Payment is pending');
       values.status = STATUS_INPROGRESS;
-      values.signature = DataUrl;
+      values.signature = Boolean(DataUrl) ? DataUrl : '';
       await axios.put(
         `/api/maintenances/${docId}/maintenanceData/${selectedRecord._id}`,
         values
@@ -163,14 +164,33 @@ const CollectionPage = () => {
               <Card
                 style={{
                   cursor: 'pointer',
-                  boxShadow: '1px 3px 1px 0px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '1px 3px 1px 0px rgba(0, 0, 0, 0.1)',
+                  textAlign: 'center'
                 }}
                 onClick={() => {
                   openDrawer(record);
                 }}
               >
                 <Meta
-                  title={record?.flatNo || 'No Title'}
+                  title={
+                    <Title
+                      level={2} // Adjust the level as needed
+                      style={{
+                        margin: 0,
+                        fontFamily: "'Bangers', cursive",
+                        color:
+                          record?.status === STATUS_INPROGRESS
+                            ? 'orange'
+                            : record?.status === STATUS_APPROVED
+                            ? 'green'
+                            : 'grey',
+                        textAlign: 'center',
+                        fontStyle: 'italic'
+                      }}
+                    >
+                      {record?.flatNo || ''}
+                    </Title>
+                  }
                   description={
                     record?.comments ||
                     (Boolean(record?.date) &&
@@ -190,8 +210,8 @@ const CollectionPage = () => {
                       }
                       style={{ textTransform: 'uppercase' }}
                     >
-                      <ClockCircleOutlined style={{ marginRight: 2 }} />{' '}
-                      Approval Pending
+                      <ClockCircleOutlined style={{ marginRight: 2 }} /> IN
+                      Approval
                     </Tag>
                   )}
 
@@ -375,7 +395,7 @@ const CollectionPage = () => {
                   ref={signatureRef}
                   penColor='black'
                   canvasProps={{
-                    width: '400px',
+                    width: '352px',
                     height: '150px',
                     className: 'signatureCanvas'
                   }}

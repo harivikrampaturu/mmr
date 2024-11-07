@@ -91,6 +91,7 @@ export async function GET(request) {
         0
       ) || 0;
     const overallTotal =
+      maintenance.openingBalance +
       totalOccupiedAmount +
       totalPartialAmount +
       additionalIncome -
