@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import {
@@ -31,8 +31,10 @@ import {
 } from '../constants';
 import DataViewing from '@/app/common/components/DataView';
 import { getFormatedMonthName } from '@/utils/helpers';
+import { ClockCircleOutlined, PayCircleOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
+import SignatureCanvas from 'react-signature-canvas';
 
 const CollectionPage = () => {
   const [maintenance, setMaintenance] = useState({});
@@ -48,6 +50,8 @@ const CollectionPage = () => {
     date: '',
     status: ''
   });
+  const [isDrawing, setIsDrawing] = useState(false); // Track whether the user is drawing
+  let signatureRef = useRef(null);
 
   const [form] = Form.useForm();
 
@@ -87,13 +91,20 @@ const CollectionPage = () => {
     setDrawerVisible(true);
   };
 
+  const clearSignature = () => {
+    signatureRef.current.clear();
+  };
+
   // Handle form submission for updating maintenance data
   const onFinish = async (values) => {
     setSaving(true);
     try {
+      const DataUrl = signatureRef.current.getCanvas().toDataURL();
+      console.log('Signature Data URL:', DataUrl);
       if (values.payment === PAYMENT_PENDING)
         throw new Error('Payment is pending');
       values.status = STATUS_INPROGRESS;
+      values.signature = DataUrl;
       await axios.put(
         `/api/maintenances/${docId}/maintenanceData/${selectedRecord._id}`,
         values
@@ -109,6 +120,7 @@ const CollectionPage = () => {
       message.error('Error updating maintenance data');
     } finally {
       setSaving(false);
+      clearSignature();
     }
   };
 
@@ -119,6 +131,14 @@ const CollectionPage = () => {
       ...prevData,
       [name]: value
     }));
+  };
+
+  const handleBeginDrawing = () => {
+    setIsDrawing(true); // Set drawing state to true when the user starts drawing
+  };
+
+  const handleEndDrawing = () => {
+    setIsDrawing(false); // Set drawing state to false when the user finishes drawing
   };
 
   return (
@@ -142,7 +162,8 @@ const CollectionPage = () => {
             <Col xs={12} sm={12} md={8} lg={6} xl={4} key={record._id}>
               <Card
                 style={{
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxShadow: '1px 3px 1px 0px rgba(0, 0, 0, 0.1)'
                 }}
                 onClick={() => {
                   openDrawer(record);
@@ -158,7 +179,7 @@ const CollectionPage = () => {
                   }
                 />
                 <div style={{ marginTop: 16 }}>
-                  {record?.status !== STATUS_INITIAL && (
+                  {record?.status === STATUS_INPROGRESS && (
                     <Tag
                       color={
                         record?.status === STATUS_INPROGRESS
@@ -169,7 +190,8 @@ const CollectionPage = () => {
                       }
                       style={{ textTransform: 'uppercase' }}
                     >
-                      Approval: {record?.status}
+                      <ClockCircleOutlined style={{ marginRight: 2 }} />{' '}
+                      Approval Pending
                     </Tag>
                   )}
 
@@ -183,6 +205,7 @@ const CollectionPage = () => {
                     }
                     style={{ textTransform: 'uppercase' }}
                   >
+                    <PayCircleOutlined style={{ marginRight: 3 }} />{' '}
                     {record?.payment === PAYMENT_PARTIAL
                       ? `Paid-${maintenance?.partialAmount}`
                       : record?.payment}{' '}
@@ -199,7 +222,7 @@ const CollectionPage = () => {
         title='Maintenance Record'
         width={400}
         onClose={() => setDrawerVisible(false)}
-        visible={drawerVisible}
+        open={drawerVisible}
         footer={
           selectedRecord?.status === STATUS_INITIAL && (
             <div className='flex justify-between'>
@@ -308,11 +331,9 @@ const CollectionPage = () => {
                 }
                 name='paymentMode'
               >
-                <Select.Option value={PAYMENT_MODE_CASH}>
-                  {PAYMENT_MODE_CASH}
-                </Select.Option>
+                <Select.Option value={PAYMENT_MODE_CASH}>Cash</Select.Option>
                 <Select.Option value={PAYMENT_MODE_ONLINE}>
-                  {PAYMENT_MODE_ONLINE}
+                  Online
                 </Select.Option>
               </Select>
             </Form.Item>
@@ -320,28 +341,55 @@ const CollectionPage = () => {
             <Form.Item
               label='Date'
               name='date'
-              rules={[{ required: true, message: 'Please select a date' }]}
+              rules={[{ required: true, message: 'Please select Date' }]}
             >
               <DatePicker
-                value={
-                  formData.date
-                    ? parse(formData.date, 'yyyy-MM-dd', new Date())
-                    : new Date()
-                }
-                onChange={(date) =>
-                  setFormData({ ...formData, date: format(date, 'yyyy-MM-dd') })
-                }
+                format='YYYY-MM-DD'
+                value={formData.date}
+                onChange={(date) => setFormData({ ...formData, date })}
                 style={{ width: '100%' }}
               />
             </Form.Item>
 
             <Form.Item label='Comments' name='comments'>
               <Input.TextArea
-                placeholder='Enter comments (Cash given to Watchman)'
+                rows={4}
+                placeholder='Enter comments (optional)'
                 value={formData.comments}
                 onChange={handleInputChange}
                 name='comments'
               />
+            </Form.Item>
+
+            <Form.Item label='Signature'>
+              <div
+                style={{
+                  border: '1px solid #ccc',
+                  borderRadius: '5px',
+                  width: '100%',
+                  height: '150px',
+                  overflow: 'hidden'
+                }}
+              >
+                <SignatureCanvas
+                  ref={signatureRef}
+                  penColor='black'
+                  canvasProps={{
+                    width: '400px',
+                    height: '150px',
+                    className: 'signatureCanvas'
+                  }}
+                  onBegin={handleBeginDrawing}
+                  onEnd={handleEndDrawing}
+                />
+              </div>
+              <Button
+                onClick={clearSignature}
+                type='link'
+                style={{ marginTop: 10 }}
+              >
+                Clear Signature
+              </Button>
             </Form.Item>
           </Form>
         )}

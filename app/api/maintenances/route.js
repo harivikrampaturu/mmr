@@ -25,7 +25,8 @@ const generateMaintenanceData = () => {
         date: '',
         status: STATUS_INITIAL,
         paymentMode: PAYMENT_MODE_CASH,
-        residentName: ''
+        residentName: '',
+        signature: ''
       });
     }
   }

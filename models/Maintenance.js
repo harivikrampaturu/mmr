@@ -7,7 +7,8 @@ const maintenanceDataSchema = new mongoose.Schema({
   comments: String,
   date: String,
   status: String,
-  paymentMode: String
+  paymentMode: String,
+  signature: String
 });
 
 const expenseSchema = new mongoose.Schema({
