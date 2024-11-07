@@ -14,16 +14,23 @@ import {
   Spin,
   Tag,
   Select,
-  DatePicker
+  DatePicker,
+  Skeleton,
+  Typography
 } from 'antd';
 import { format, parse } from 'date-fns';
 import {
   PAYMENT_PENDING,
   STATUS_INITIAL,
   STATUS_INPROGRESS,
-  STATUS_APPROVED
+  STATUS_APPROVED,
+  PAYMENT_PARTIAL,
+  PAYMENT_PAID,
+  PAYMENT_MODE_CASH,
+  PAYMENT_MODE_ONLINE
 } from '../constants';
-import DataViewing from './DataView';
+import DataViewing from '@/app/common/components/DataView';
+import { getFormatedMonthName } from '@/utils/helpers';
 
 const { Meta } = Card;
 
@@ -36,7 +43,7 @@ const CollectionPage = () => {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     flatNo: '',
-    payment: 'paid' || '',
+    payment: PAYMENT_PAID || '',
     comments: '',
     date: '',
     status: ''
@@ -114,16 +121,18 @@ const CollectionPage = () => {
     }));
   };
 
-  // Handle form submission
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    // You can process the form data as needed here
-    console.log(formData);
-  };
-
   return (
     <div style={{ padding: '24px' }}>
-      <h2>Maintenance Records of {maintenance?.monthName}</h2>
+      <h2 className='flex justify-center items-center m-2'>
+        Maintenance Collection of{' '}
+        <Typography.Text
+          style={{ color: 'green', fontSize: '18px', marginLeft: '5px' }}
+          strong
+        >
+          {Boolean(maintenance?.monthName) &&
+            getFormatedMonthName(maintenance?.monthName)}{' '}
+        </Typography.Text>
+      </h2>
 
       {loading ? (
         <Spin tip='Loading...' />
@@ -135,44 +144,48 @@ const CollectionPage = () => {
                 style={{
                   cursor: 'pointer'
                 }}
-                /* style={{
-                  cursor:
-                    record?.status === 'inprogress' ||
-                    record?.status === STATUS_APPROVED
-                      ? 'not-allowed'
-                      : 'pointer'
-                }} */
                 onClick={() => {
-                  /* if (
-                    record?.status !== 'inprogress' &&
-                    record?.status !== STATUS_APPROVED
-                  ) {
-                    openDrawer(record);
-                  } */
                   openDrawer(record);
                 }}
               >
                 <Meta
                   title={record?.flatNo || 'No Title'}
                   description={
-                    record?.comments || record?.date || 'No Description'
+                    record?.comments ||
+                    (Boolean(record?.date) &&
+                      format(record?.date, 'yyyy-MM-dd')) ||
+                    'No Description'
                   }
                 />
                 <div style={{ marginTop: 16 }}>
+                  {record?.status !== STATUS_INITIAL && (
+                    <Tag
+                      color={
+                        record?.status === STATUS_INPROGRESS
+                          ? 'orange'
+                          : record?.status === STATUS_APPROVED
+                          ? 'green'
+                          : 'blue'
+                      }
+                      style={{ textTransform: 'uppercase' }}
+                    >
+                      Approval: {record?.status}
+                    </Tag>
+                  )}
+
                   <Tag
                     color={
-                      record?.status === STATUS_INPROGRESS
-                        ? 'orange'
-                        : record?.status === STATUS_APPROVED
+                      record?.payment === PAYMENT_PAID
                         ? 'green'
-                        : 'blue'
+                        : record?.payment === PAYMENT_PARTIAL
+                        ? 'purple'
+                        : 'red'
                     }
-                    style={{ textTransform: 'capitalize' }}
+                    style={{ textTransform: 'uppercase' }}
                   >
-                    {record?.payment === 'partial'
+                    {record?.payment === PAYMENT_PARTIAL
                       ? `Paid-${maintenance?.partialAmount}`
                       : record?.payment}{' '}
-                    | {record?.status}
                   </Tag>
                 </div>
               </Card>
@@ -187,6 +200,25 @@ const CollectionPage = () => {
         width={400}
         onClose={() => setDrawerVisible(false)}
         visible={drawerVisible}
+        footer={
+          selectedRecord?.status === STATUS_INITIAL && (
+            <div className='flex justify-between'>
+              <Button
+                onClick={() => setDrawerVisible(false)}
+                style={{ marginRight: 8 }}
+              >
+                Cancel
+              </Button>
+              <Button
+                form='recordCollectionForm'
+                type='primary'
+                htmlType='submit'
+              >
+                Submit
+              </Button>
+            </div>
+          )
+        }
       >
         {(selectedRecord?.status === STATUS_INPROGRESS ||
           selectedRecord?.status === STATUS_APPROVED) && (
@@ -196,7 +228,12 @@ const CollectionPage = () => {
           </pre>
         )}
         {selectedRecord?.status === STATUS_INITIAL && (
-          <Form form={form} layout='vertical' onFinish={onFinish}>
+          <Form
+            form={form}
+            layout='vertical'
+            id='recordCollectionForm'
+            onFinish={onFinish}
+          >
             <Form.Item
               label='Flat No'
               name='flatNo'
@@ -213,12 +250,32 @@ const CollectionPage = () => {
                 disabled
               />
             </Form.Item>
+            <Form.Item label='Resident Name' name='residentName'>
+              <Input
+                type='text'
+                placeholder='Enter Name(optional)'
+                value={formData.residentName}
+                onChange={handleInputChange}
+                name='residentName'
+              />
+            </Form.Item>
 
             <Form.Item
               label='Maintenance Amount'
               name='payment'
               rules={[
-                { required: true, message: 'Please select Maintenance Amount' }
+                {
+                  required: true,
+                  message: 'Please Select the Maintenance Amount',
+                  validator: (_, value) => {
+                    if (value === PAYMENT_PENDING) {
+                      return Promise.reject(
+                        new Error('Payment cannot be set to PAYMENT_PENDING')
+                      );
+                    }
+                    return Promise.resolve();
+                  }
+                }
               ]}
             >
               <Select
@@ -228,23 +285,36 @@ const CollectionPage = () => {
                 }
                 name='payment'
               >
-                <Select.Option value='paid'>
+                <Select.Option value={PAYMENT_PAID}>
                   {maintenance?.amount}
                 </Select.Option>
-                <Select.Option value='partial'>
+                <Select.Option value={PAYMENT_PARTIAL}>
                   {maintenance?.partialAmount}
                 </Select.Option>
               </Select>
             </Form.Item>
 
-            <Form.Item label='Comments' name='comments'>
-              <Input
-                type='text'
-                placeholder='Enter comments'
-                value={formData.comments}
-                onChange={handleInputChange}
-                name='comments'
-              />
+            <Form.Item
+              label='Payment Mode'
+              name='paymentMode'
+              rules={[
+                { required: true, message: 'Please select Payment mode' }
+              ]}
+            >
+              <Select
+                value={formData.paymentMode}
+                onChange={(value) =>
+                  setFormData({ ...formData, paymentMode: value })
+                }
+                name='paymentMode'
+              >
+                <Select.Option value={PAYMENT_MODE_CASH}>
+                  {PAYMENT_MODE_CASH}
+                </Select.Option>
+                <Select.Option value={PAYMENT_MODE_ONLINE}>
+                  {PAYMENT_MODE_ONLINE}
+                </Select.Option>
+              </Select>
             </Form.Item>
 
             <Form.Item
@@ -261,17 +331,18 @@ const CollectionPage = () => {
                 onChange={(date) =>
                   setFormData({ ...formData, date: format(date, 'yyyy-MM-dd') })
                 }
+                style={{ width: '100%' }}
               />
             </Form.Item>
 
-            {(formData.status !== STATUS_INPROGRESS ||
-              formData.status !== STATUS_APPROVED) && (
-              <Form.Item>
-                <Button type='primary' htmlType='submit' loading={saving}>
-                  Update Maintenance
-                </Button>
-              </Form.Item>
-            )}
+            <Form.Item label='Comments' name='comments'>
+              <Input.TextArea
+                placeholder='Enter comments (Cash given to Watchman)'
+                value={formData.comments}
+                onChange={handleInputChange}
+                name='comments'
+              />
+            </Form.Item>
           </Form>
         )}
       </Drawer>

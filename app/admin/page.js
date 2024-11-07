@@ -18,14 +18,22 @@ import {
 import {
   FileExcelOutlined,
   FilePdfOutlined,
-  PlusOutlined
+  PlusOutlined,
+  ShareAltOutlined
 } from '@ant-design/icons';
 import { format } from 'date-fns';
 import MaintenanceMonthExpenses from './MonthExpenses';
 import MaintenanceDetails from './MaintenanceDetails';
-import { PAYMENT_PAID, PAYMENT_PARTIAL, PAYMENT_PENDING } from '../constants';
+import {
+  PAYMENT_PAID,
+  PAYMENT_PARTIAL,
+  PAYMENT_PENDING,
+  STATUS_INPROGRESS
+} from '../constants';
 import Logout from '../common/components/Logout';
 import UpdateMonth from './UpdateMonth';
+import { startOfMonth, isBefore } from 'date-fns';
+import { getFormatedMonthName } from '@/utils/helpers';
 
 const AdminPage = () => {
   const [months, setMonths] = useState([]);
@@ -109,7 +117,7 @@ const AdminPage = () => {
   const handleCreateMonth = async () => {
     try {
       const values = await form.validateFields();
-      values.monthName = format(values.monthName, 'MMMM yyyy');
+      values.monthName = new Date(values.monthName).toISOString(); //format(values.monthName, 'MMMM yyyy');
       values.amount = Number(values.amount);
       values.partialAmount = Number(values.partialAmount);
       values.openingBalance = Number(values.openingBalance);
@@ -143,12 +151,21 @@ const AdminPage = () => {
     return expenses.reduce((total, expense) => total + expense.amount, 0);
   };
 
+  const handlePendingApprovals = (maintenanceData) => {
+    return maintenanceData.reduce((total, maintenanceData) => {
+      return Boolean(maintenanceData.status === STATUS_INPROGRESS)
+        ? total + 1
+        : total;
+    }, 0);
+  };
+
   const columns = [
     {
       title: 'Month Name',
       dataIndex: 'monthName',
       key: 'monthName',
-      ellipsis: true
+      ellipsis: true,
+      render: (text, record) => getFormatedMonthName(record.monthName)
     },
     {
       title: 'Total Maintenance',
@@ -167,6 +184,13 @@ const AdminPage = () => {
       className: 'hidden md:table-cell',
       render: (text, record) => (
         <span>{calculateTotalExpenses(record?.expenses)}</span>
+      )
+    },
+    {
+      title: 'Pending Approvals',
+      className: 'hidden md:table-cell',
+      render: (text, record) => (
+        <span>{handlePendingApprovals(record?.maintenanceData) || 0}</span>
       )
     },
     {
@@ -206,6 +230,25 @@ const AdminPage = () => {
 
   if (loading) return <Skeleton />;
 
+  const disabledDate = (current) => {
+    // Disable dates before the start of the current month
+    return current && isBefore(current.toDate(), startOfMonth(new Date()));
+  };
+
+  const handleCopy = () => {
+    const docId = selectedMonth._id; // Replace this with your dynamic docId if needed
+    const url = `${window.location.origin}/collection?docId=${docId}`;
+
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        message.success('Link copied to clipboard!');
+      })
+      .catch(() => {
+        message.error('Failed to copy link.');
+      });
+  };
+
   return (
     <div className='mx-auto p-2 pr-4 pl-4'>
       <div className='flex flex-row items-center justify-between'>
@@ -238,15 +281,19 @@ const AdminPage = () => {
 
       {selectedMonth && (
         <Drawer
-          title={`${selectedMonth.monthName} Details`}
+          title={`${getFormatedMonthName(selectedMonth.monthName)}  Details`}
           width={720}
           onClose={() => {
             setDrawerVisible(false);
             setSelectedMonth(null);
             fetchMaintenanceMonths();
           }}
-          visible={drawerVisible}
-          bodyStyle={{ paddingBottom: 80 }}
+          open={drawerVisible}
+          extra={
+            <Button icon={<ShareAltOutlined />} onClick={handleCopy}>
+              Share to Watchman
+            </Button>
+          }
         >
           <Tabs defaultActiveKey='1'>
             <Tabs.TabPane tab='Expenses' key='1'>
@@ -277,7 +324,12 @@ const AdminPage = () => {
             label='Month Name'
             rules={[{ required: true, message: 'Please select the month' }]}
           >
-            <DatePicker picker='month' format='MMMM yyyy' />
+            <DatePicker
+              picker='month'
+              format='MMMM YYYY'
+              style={{ width: '100%' }}
+              disabledDate={disabledDate}
+            />
           </Form.Item>
 
           <Form.Item

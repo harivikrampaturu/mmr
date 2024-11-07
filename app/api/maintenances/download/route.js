@@ -1,6 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import dbConnect from '@/lib/dbConnect';
 import MaintenanceModel from '@/models/Maintenance';
+import { PAYMENT_PAID, PAYMENT_PARTIAL } from '@/app/constants';
 
 export async function GET(request) {
   await dbConnect();
@@ -41,7 +42,7 @@ export async function GET(request) {
     // Calculations with default values to avoid undefined errors
     const unoccupiedFlats =
       maintenance.maintenanceData?.filter(
-        (entry) => entry.payment === 'partial'
+        (entry) => entry.payment === PAYMENT_PARTIAL
       ) || [];
     const totalPartialAmount = unoccupiedFlats.reduce(
       (sum, entry) => sum + (maintenance.partialAmount || 0),
@@ -50,7 +51,7 @@ export async function GET(request) {
 
     const paidFlats =
       maintenance.maintenanceData?.filter(
-        (entry) => entry.payment === 'paid'
+        (entry) => entry.payment === PAYMENT_PAID
       ) || [];
     const totalOccupiedAmount = paidFlats.reduce(
       (sum, entry) => sum + (maintenance.partialAmount || 0),

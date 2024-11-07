@@ -2,10 +2,12 @@ import mongoose from 'mongoose';
 
 const maintenanceDataSchema = new mongoose.Schema({
   flatNo: Number,
+  residentName: String,
   payment: String,
   comments: String,
   date: String,
-  status: String
+  status: String,
+  paymentMode: String
 });
 
 const expenseSchema = new mongoose.Schema({

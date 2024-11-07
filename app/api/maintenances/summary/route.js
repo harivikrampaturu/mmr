@@ -3,6 +3,8 @@ import MaintenanceModel from '@/models/Maintenance';
 import ExcelJS from 'exceljs';
 import { format } from 'date-fns';
 import { authenticate } from '@/lib/middleware';
+import { PAYMENT_PAID, PAYMENT_PARTIAL } from '@/app/constants';
+import { getFormatedMonthName } from '@/utils/helpers';
 
 export async function GET(request) {
   const authResponse = await authenticate(request);
@@ -51,7 +53,9 @@ export async function GET(request) {
     worksheet.mergeCells('A2', 'E2');
     worksheet.getCell(
       'A2'
-    ).value = `Balance Sheet for the Month of ${monthName}`;
+    ).value = `Balance Sheet for the Month of ${getFormatedMonthName(
+      monthName
+    )}`;
     worksheet.getCell('A2').alignment = { horizontal: 'center' };
 
     // Table Header
@@ -64,7 +68,7 @@ export async function GET(request) {
     // Calculations with default values to avoid undefined errors
     const unoccupiedFlats =
       maintenance.maintenanceData?.filter(
-        (entry) => entry.payment === 'partial'
+        (entry) => entry.payment === PAYMENT_PARTIAL
       ) || [];
     const totalPartialAmount = unoccupiedFlats.reduce(
       (sum, entry) => sum + (maintenance.partialAmount || 0),
@@ -73,7 +77,7 @@ export async function GET(request) {
 
     const paidFlats =
       maintenance.maintenanceData?.filter(
-        (entry) => entry.payment === 'paid'
+        (entry) => entry.payment === PAYMENT_PAID
       ) || [];
     const totalOccupiedAmount = paidFlats.reduce(
       (sum, entry) => sum + (maintenance.amount || 0),
@@ -136,7 +140,9 @@ export async function GET(request) {
     // worksheet.addRow([`Expenditures of ${monthName}`]);
     worksheet.addRow(['']);
     worksheet.mergeCells('A10', 'E10');
-    worksheet.getCell('A10').value = `Expenditures of ${monthName}`;
+    worksheet.getCell('A10').value = `Expenditures of ${getFormatedMonthName(
+      monthName
+    )}`;
     worksheet.getCell('A10').alignment = { horizontal: 'center' };
 
     // Expenses Table Header
@@ -200,7 +206,9 @@ export async function GET(request) {
       headers: {
         'Content-Type':
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="${monthName}-Maintenance-Statement.xlsx"`
+        'Content-Disposition': `attachment; filename="${getFormatedMonthName(
+          monthName
+        )}-Maintenance-Statement.xlsx"`
       }
     });
   }

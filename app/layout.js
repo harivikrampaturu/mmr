@@ -1,7 +1,6 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Link from 'next/link';
-
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
@@ -10,6 +9,8 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  // Check if the current route is '/comments'
+
   return (
     <html lang='en'>
       <body className={inter.className}>
@@ -21,7 +22,7 @@ export default function RootLayout({ children }) {
               <img src='/logo.png' className='max-w-[80px]' />
             </span>
           </Link>
-          <nav className='flex items-center gap-4'>
+          <nav className={`flex items-center gap-4 `}>
             <Link
               href='/'
               className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50'
@@ -29,16 +30,10 @@ export default function RootLayout({ children }) {
             >
               Home
             </Link>
-            {/*   <Link
-              href='#'
-              className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50'
-              prefetch={false}
-            >
-              Events
-            </Link> */}
+
             <Link
               href='/residents'
-              className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50'
+              className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 hidden'
               prefetch={false}
             >
               Residents

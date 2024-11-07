@@ -1,6 +1,7 @@
 import {
   MONTH_EXPENSES,
   MONTH_MAINTENANCE_DATA,
+  PAYMENT_MODE_CASH,
   PAYMENT_PENDING,
   STATUS_INITIAL
 } from '@/app/constants';
@@ -22,7 +23,9 @@ const generateMaintenanceData = () => {
         payment: PAYMENT_PENDING, // Default amount
         comments: '', // Default comments
         date: '',
-        status: STATUS_INITIAL
+        status: STATUS_INITIAL,
+        paymentMode: PAYMENT_MODE_CASH,
+        residentName: ''
       });
     }
   }
