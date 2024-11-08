@@ -387,13 +387,7 @@ const CollectionPage = () => {
               />
             </Form.Item>
 
-            <Form.Item
-              name='signature'
-              label='Signature'
-              rules={[
-                { required: true, message: 'Please draw your signature' }
-              ]}
-            >
+            <Form.Item name='signature' label='Signature'>
               <div
                 style={{
                   border: '1px solid #ccc',
