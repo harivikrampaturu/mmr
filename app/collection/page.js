@@ -32,6 +32,7 @@ import {
 import DataViewing from '@/app/common/components/DataView';
 import { getFormatedMonthName } from '@/utils/helpers';
 import { ClockCircleOutlined, PayCircleOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 const { Meta } = Card;
 const { Title } = Typography;
@@ -46,12 +47,12 @@ const CollectionPage = () => {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     flatNo: '',
-    payment: PAYMENT_PAID || '',
+    payment: '',
     comments: '',
     date: '',
     status: ''
   });
-  const [isDrawing, setIsDrawing] = useState(false); // Track whether the user is drawing
+  const [isDrawn, setIsDrawn] = useState(false); // Track whether the user is drawing
   let signatureRef = useRef(null);
 
   const [form] = Form.useForm();
@@ -87,13 +88,15 @@ const CollectionPage = () => {
     setSelectedRecord(record);
     form.setFieldsValue({
       ...record,
-      date: record.date ? parse(record.date, 'yyyy-MM-dd', new Date()) : ''
+      date: record.date ? dayjs(record.date) : dayjs(new Date()),
+      payment: PAYMENT_PAID
     });
     setDrawerVisible(true);
   };
 
   const clearSignature = () => {
-    signatureRef.current.clear();
+    signatureRef?.current && signatureRef?.current.clear();
+    setIsDrawn(false);
   };
 
   // Handle form submission for updating maintenance data
@@ -105,7 +108,7 @@ const CollectionPage = () => {
       if (values.payment === PAYMENT_PENDING)
         throw new Error('Payment is pending');
       values.status = STATUS_INPROGRESS;
-      values.signature = Boolean(DataUrl) ? DataUrl : '';
+      values.signature = Boolean(isDrawn) ? DataUrl : '';
       await axios.put(
         `/api/maintenances/${docId}/maintenanceData/${selectedRecord._id}`,
         values
@@ -135,11 +138,14 @@ const CollectionPage = () => {
   };
 
   const handleBeginDrawing = () => {
-    setIsDrawing(true); // Set drawing state to true when the user starts drawing
+    setIsDrawn(true); // Set drawing state to true when the user starts drawing
   };
 
-  const handleEndDrawing = () => {
-    setIsDrawing(false); // Set drawing state to false when the user finishes drawing
+  const handleEndDrawing = () => {};
+
+  const handleClearAndClose = () => {
+    setDrawerVisible(false);
+    clearSignature();
   };
 
   return (
@@ -158,7 +164,7 @@ const CollectionPage = () => {
       {loading ? (
         <Spin tip='Loading...' />
       ) : (
-        <Row gutter={[16, 16]}>
+        <Row gutter={[8, 8]}>
           {maintenanceData?.map((record) => (
             <Col xs={12} sm={12} md={8} lg={6} xl={4} key={record._id}>
               <Card
@@ -241,23 +247,23 @@ const CollectionPage = () => {
       <Drawer
         title='Maintenance Record'
         width={400}
-        onClose={() => setDrawerVisible(false)}
+        onClose={handleClearAndClose}
         open={drawerVisible}
         footer={
           selectedRecord?.status === STATUS_INITIAL && (
-            <div className='flex justify-between'>
-              <Button
-                onClick={() => setDrawerVisible(false)}
-                style={{ marginRight: 8 }}
-              >
+            <div className='flex justify-center'>
+              {/*   <Button onClick={handleClearAndClose} style={{ marginRight: 8 }}>
                 Cancel
-              </Button>
+              </Button> */}
               <Button
                 form='recordCollectionForm'
                 type='primary'
                 htmlType='submit'
+                size='large'
+                loading={saving}
+                disabled={!isDrawn}
               >
-                Submit
+                Submit Maintenance
               </Button>
             </div>
           )
@@ -374,14 +380,20 @@ const CollectionPage = () => {
             <Form.Item label='Comments' name='comments'>
               <Input.TextArea
                 rows={4}
-                placeholder='Enter comments (optional)'
+                placeholder='Enter comments'
                 value={formData.comments}
                 onChange={handleInputChange}
                 name='comments'
               />
             </Form.Item>
 
-            <Form.Item label='Signature'>
+            <Form.Item
+              name='signature'
+              label='Signature'
+              rules={[
+                { required: true, message: 'Please draw your signature' }
+              ]}
+            >
               <div
                 style={{
                   border: '1px solid #ccc',
@@ -392,6 +404,7 @@ const CollectionPage = () => {
                 }}
               >
                 <SignatureCanvas
+                  name='signature'
                   ref={signatureRef}
                   penColor='black'
                   canvasProps={{
