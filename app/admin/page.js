@@ -147,7 +147,7 @@ const AdminPage = () => {
     }, 0);
   };
 
-  const calculateTotalExpenses = (expenses) => {
+  const calculateTotalExpenses = (expenses = []) => {
     return expenses.reduce((total, expense) => total + expense.amount, 0);
   };
 

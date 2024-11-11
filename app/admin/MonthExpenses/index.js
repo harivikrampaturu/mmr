@@ -64,7 +64,7 @@ const deleteExpense = async (maintenanceId, expenseId) => {
   }
 };
 
-const calculateTotalExpenses = (expenses) => {
+const calculateTotalExpenses = (expenses = []) => {
   return expenses.reduce((total, expense) => total + expense.amount, 0);
 };
 

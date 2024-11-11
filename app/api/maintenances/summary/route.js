@@ -6,6 +6,14 @@ import { authenticate } from '@/lib/middleware';
 import { PAYMENT_PAID, PAYMENT_PARTIAL } from '@/app/constants';
 import { getFormatedMonthName } from '@/utils/helpers';
 
+function formatToIndianRupee(amount) {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2
+  }).format(amount);
+}
+
 export async function GET(request) {
   const authResponse = await authenticate(request);
   if (authResponse instanceof Response && authResponse.status === 401) {
@@ -55,7 +63,7 @@ export async function GET(request) {
       'A2'
     ).value = `Balance Sheet for the Month of ${getFormatedMonthName(
       monthName
-    )}`;
+    )} (A)`;
     worksheet.getCell('A2').alignment = { horizontal: 'center' };
 
     // Table Header
@@ -118,7 +126,11 @@ export async function GET(request) {
       {
         sno: '',
         description: 'Total',
-        amount: totalOccupiedAmount + totalPartialAmount + additionalIncome
+        amount:
+          totalOccupiedAmount +
+          totalPartialAmount +
+          additionalIncome +
+          maintenance.openingBalance
       }
     ];
     worksheet.mergeCells(`C3:E3`);
@@ -143,7 +155,7 @@ export async function GET(request) {
     worksheet.mergeCells('A10', 'E10');
     worksheet.getCell('A10').value = `Expenditures of ${getFormatedMonthName(
       monthName
-    )}`;
+    )} (B)`;
     worksheet.getCell('A10').alignment = { horizontal: 'center' };
 
     // Expenses Table Header
@@ -175,14 +187,36 @@ export async function GET(request) {
     worksheet
       .addRow(['', '', '', 'Total Expenses', expensesTotal])
       .eachCell((cell, colNumber) => {
-        if (colNumber === 5) cell.numFmt = '₹#,##0.00';
+        if (colNumber === 5) {
+          cell.numFmt = '₹#,##0.00';
+          cell.font = { color: { argb: 'FFFF0000' } };
+        }
+        if (colNumber === 4)
+          cell.font = { bold: true, color: { argb: 'FFFF0000' } };
         Object.assign(cell, cellStyle);
       });
+    //   Two Empty rows
+    worksheet.addRow(['']);
+    worksheet.addRow(['']);
 
     // Overall Total
-    worksheet
-      .addRow(['', '', '', '', `Overall Total: Rs.${overallTotal}`])
-      .getCell(5).alignment = { horizontal: 'right' };
+    const overallTotalRow = worksheet.addRow([
+      '',
+      '',
+      '',
+      'Overall Total (A - B):',
+      ` ${formatToIndianRupee(overallTotal)}`
+    ]);
+
+    overallTotalRow.getCell(4).font = { bold: true };
+    // Align the value in the fifth column to the right
+    overallTotalRow.getCell(5).alignment = { horizontal: 'right' };
+    overallTotalRow.getCell(5).font = {
+      bold: true,
+      color: {
+        argb: overallTotal >= 0 ? 'FF008000' : 'FFFF0000' // Green for >= 0, Red for < 0
+      }
+    };
 
     //   Two Empty rows
     worksheet.addRow(['']);
@@ -197,6 +231,15 @@ export async function GET(request) {
         ''
       ])
       .getCell(5).alignment = { horizontal: 'center' };
+
+    worksheet.getColumn(2).width = 30; // Column B
+    worksheet.getColumn(4).width = 20; // Column D
+    worksheet.getColumn(5).width = 25; // Column E
+
+    // Center align text horizontally for column A
+    worksheet.getColumn(1).eachCell((cell) => {
+      cell.alignment = { horizontal: 'center' };
+    });
 
     // Generate Excel file buffer
     const buffer = await workbook.xlsx.writeBuffer();
