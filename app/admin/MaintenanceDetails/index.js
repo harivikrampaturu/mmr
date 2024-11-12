@@ -1,5 +1,5 @@
 // components/MaintenanceData.js
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   List,
   Drawer,
@@ -34,12 +34,14 @@ import { format, parse } from 'date-fns';
 const { Option } = Select;
 const { Title } = Typography;
 
-const MaintenanceData = ({ id: docId }) => {
-  const [maintenance, setMaintenance] = useState({});
-  const [maintenanceData, setMaintenanceData] = useState([]);
+const MaintenanceData = ({ id: docId, selectedMonth = {} }) => {
+  const [maintenance, setMaintenance] = useState(selectedMonth);
+  const [maintenanceData, setMaintenanceData] = useState([
+    ...(selectedMonth?.maintenanceData || [])
+  ]);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showWaiting, setShowWaiting] = useState(false);
   const [appovalComments, setApprovalComments] = useState('');
 
@@ -65,12 +67,11 @@ const MaintenanceData = ({ id: docId }) => {
     }
   };
 
-  useEffect(() => {
+  /*   useEffect(() => {
     fetchMaintenanceData(docId);
-  }, [docId]);
+  }, [docId]); */
 
   const showDrawer = (record) => {
-    debugger;
     setSelectedRecord(record);
     setIsDrawerVisible(true);
   };
@@ -217,7 +218,12 @@ const MaintenanceData = ({ id: docId }) => {
               <Button onClick={closeDrawer} style={{ marginRight: 8 }}>
                 Cancel
               </Button>
-              <Button form='recordForm' type='primary' htmlType='submit'>
+              <Button
+                form='recordForm'
+                type='primary'
+                htmlType='submit'
+                loading={loading} //
+              >
                 Save
               </Button>
             </div>

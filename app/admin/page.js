@@ -42,6 +42,7 @@ const AdminPage = () => {
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [downloadingMonth, setDownloadingMonth] = useState(null);
 
   const downloadStatement = async (monthName) => {
     try {
@@ -69,7 +70,7 @@ const AdminPage = () => {
 
   const downloadExcel = async (monthName) => {
     try {
-      setLoading(true);
+      setDownloadingMonth(monthName);
       const response = await axiosApi.get(
         `/api/maintenances/summary?monthName=${monthName}`,
         {
@@ -88,11 +89,11 @@ const AdminPage = () => {
       // Clean up the URL and link
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
-      setLoading(false);
+      setDownloadingMonth(null);
     } catch (error) {
       console.error('Error downloading Excel file:', error);
       alert('There was an issue downloading the file. Please try again.');
-      setLoading(false);
+      setDownloadingMonth(null);
     }
   };
 
@@ -205,6 +206,7 @@ const AdminPage = () => {
             title='Download Excel'
             icon={<FileExcelOutlined />}
             size={'middle'}
+            loading={downloadingMonth === record.monthName}
           />
           <Button
             type='default'
@@ -297,16 +299,22 @@ const AdminPage = () => {
         >
           <Tabs defaultActiveKey='1'>
             <Tabs.TabPane tab='Expenses' key='1'>
-              <MaintenanceMonthExpenses maintenanceId={selectedMonth._id} />
+              <MaintenanceMonthExpenses
+                selectedMonth={selectedMonth}
+                maintenanceId={selectedMonth._id}
+              />
             </Tabs.TabPane>
             <Tabs.TabPane tab='Maintenance Data' key='2'>
               <MaintenanceDetails
-                maintenanceData={selectedMonth.maintenanceData}
+                selectedMonth={selectedMonth}
                 id={selectedMonth._id}
               />
             </Tabs.TabPane>
             <Tabs.TabPane tab='Settings' key='3'>
-              <UpdateMonth id={selectedMonth._id} />
+              <UpdateMonth
+                selectedMonth={selectedMonth}
+                id={selectedMonth._id}
+              />
             </Tabs.TabPane>
           </Tabs>
         </Drawer>

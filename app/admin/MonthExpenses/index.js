@@ -1,5 +1,5 @@
 /* 'use client';*/
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Input,
   InputNumber,
@@ -68,11 +68,13 @@ const calculateTotalExpenses = (expenses = []) => {
   return expenses.reduce((total, expense) => total + expense.amount, 0);
 };
 
-const ExpenseManager = ({ maintenanceId }) => {
-  const [expenses, setExpenses] = useState([]);
+const ExpenseManager = ({ maintenanceId, selectedMonth }) => {
+  const [expenses, setExpenses] = useState([
+    ...(selectedMonth?.expenses || [])
+  ]);
   const [form] = Form.useForm();
 
-  useEffect(() => {
+  /*   useEffect(() => {
     const fetchExpenses = async () => {
       const response = await fetch(`/api/maintenances/${maintenanceId}`);
       const data = await response.json();
@@ -80,7 +82,7 @@ const ExpenseManager = ({ maintenanceId }) => {
     };
 
     fetchExpenses();
-  }, [maintenanceId]);
+  }, [maintenanceId]); */
 
   const ExpenseTable = ({ expenses, handleDeleteExpense }) => {
     const columns = [

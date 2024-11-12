@@ -6,7 +6,16 @@ import { PAYMENT_PARTIAL, STATUS_INPROGRESS } from '@/app/constants';
 const { Title, Text, Paragraph } = Typography;
 
 const DataViewing = ({ data, hideTitle }) => {
-  const { flatNo, payment, comments, date, status, _id, signature } = data;
+  const {
+    flatNo,
+    payment,
+    comments,
+    date,
+    status,
+    _id,
+    signature,
+    paymentMode
+  } = data;
   const formattedDate = new Date(date).toLocaleString();
 
   return (
@@ -49,6 +58,11 @@ const DataViewing = ({ data, hideTitle }) => {
             <PayCircleOutlined style={{ marginRight: 5 }} />
             {payment}
           </Tag>
+        </Paragraph>
+
+        <Paragraph ellipsis={{ rows: 2, expandable: true }}>
+          <Text strong>Payment Mode: </Text>
+          <Text>{paymentMode}</Text>
         </Paragraph>
 
         <Paragraph ellipsis={{ rows: 2, expandable: true }}>

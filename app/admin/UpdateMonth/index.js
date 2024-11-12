@@ -3,19 +3,24 @@ import { useState, useEffect } from 'react';
 import { Form, Input, InputNumber, Button, message } from 'antd';
 import axiosApi from '@/utils/axios';
 
-const UpdateMonth = ({ id }) => {
+const UpdateMonth = ({ id, selectedMonth = {} }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
+  form.setFieldsValue(selectedMonth);
+
   // Fetch existing data if updating
-  useEffect(() => {
+  /*   useEffect(() => {
     if (id) {
       axiosApi
         .get(`/api/maintenances/${id}`)
-        .then(({ data }) => form.setFieldsValue(data))
+        .then(({ data }) => {
+          debugger;
+          return form.setFieldsValue(data);
+        })
         .catch(() => message.error('Failed to load data'));
     }
-  }, [id, form]);
+  }, [id, form]); */
 
   // Handle form submission
   const onFinish = async (values) => {
