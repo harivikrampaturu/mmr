@@ -94,17 +94,24 @@ export async function DELETE(request, { params }) {
   if (authResponse instanceof Response && authResponse.status === 401) {
     return authResponse;
   }
+
   await dbConnect();
 
-  const { id } = params; // Get the expense ID from params
+  const { id } = params; // `id` refers to the maintenance document _id (parent record)
+  const { eid } = await request.json(); // `eid` is the expense _id you want to delete
 
+  // Ensure both `id` and `eid` are ObjectId instances
   const maintenance = await Maintenance.findOneAndUpdate(
-    { 'expenses._id': mongoose.Types.ObjectId(id) }, // Use the correct expense ID
-    { $pull: { expenses: { _id: mongoose.Types.ObjectId(id) } } }, // Pull the expense from the expenses array
-    { new: true }
+    {
+      _id: new mongoose.Types.ObjectId(id),
+      'expenses._id': new mongoose.Types.ObjectId(eid)
+    }, // Ensure the maintenance ID and expense ID match
+    { $pull: { expenses: { _id: new mongoose.Types.ObjectId(eid) } } }, // Pull the expense with the matching _id
+    { new: true } // Return the updated document
   );
 
   if (!maintenance) {
+    // If the maintenance document or the expense is not found, return a 404 response
     return NextResponse.json({ message: 'Expense not found' }, { status: 404 });
   }
 
