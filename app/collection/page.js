@@ -42,7 +42,6 @@ const { Meta } = Card;
 const { Title } = Typography;
 import SignatureCanvas from 'react-signature-canvas';
 
-window.fetMD = null;
 const CollectionPage = () => {
   const [maintenance, setMaintenance] = useState({});
   const [maintenanceData, setMaintenanceData] = useState([]);
@@ -85,7 +84,6 @@ const CollectionPage = () => {
     }
   }, [docId]);
 
-  window.fetMD = fetchMaintenanceData;
   // Use the memoized function in useEffect
   useEffect(() => {
     fetchMaintenanceData();
