@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import {
@@ -31,13 +31,18 @@ import {
 } from '../constants';
 import DataViewing from '@/app/common/components/DataView';
 import { getFormatedMonthName } from '@/utils/helpers';
-import { ClockCircleOutlined, PayCircleOutlined } from '@ant-design/icons';
+import {
+  ClockCircleOutlined,
+  PayCircleOutlined,
+  ReloadOutlined
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 const { Meta } = Card;
 const { Title } = Typography;
 import SignatureCanvas from 'react-signature-canvas';
 
+window.fetMD = null;
 const CollectionPage = () => {
   const [maintenance, setMaintenance] = useState({});
   const [maintenanceData, setMaintenanceData] = useState([]);
@@ -61,27 +66,30 @@ const CollectionPage = () => {
   const docId = searchParams.get('docId');
 
   // Fetch maintenance data on load
-  useEffect(() => {
+  // Memoize the fetch function
+  const fetchMaintenanceData = useCallback(async () => {
     if (!docId) return;
 
-    const fetchMaintenanceData = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          `/api/maintenances/${docId}?inCollection=true`
-        );
-        const { maintenanceData } = response.data || {};
-        setMaintenance(response.data);
-        setMaintenanceData(maintenanceData);
-      } catch (error) {
-        message.error('Error fetching maintenance data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMaintenanceData();
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `/api/maintenances/${docId}?inCollection=true`
+      );
+      const { maintenanceData } = response.data || {};
+      setMaintenance(response.data);
+      setMaintenanceData(maintenanceData);
+    } catch (error) {
+      message.error('Error fetching maintenance data');
+    } finally {
+      setLoading(false);
+    }
   }, [docId]);
+
+  window.fetMD = fetchMaintenanceData;
+  // Use the memoized function in useEffect
+  useEffect(() => {
+    fetchMaintenanceData();
+  }, [fetchMaintenanceData]);
 
   // Open drawer with form populated with selected record data
   const openDrawer = (record) => {
@@ -151,14 +159,20 @@ const CollectionPage = () => {
   return (
     <div style={{ padding: '24px' }}>
       <h2 className='flex justify-center items-center m-2'>
-        Maintenance Collection of{' '}
-        <Typography.Text
-          style={{ color: 'green', fontSize: '18px', marginLeft: '5px' }}
-          strong
-        >
-          {Boolean(maintenance?.monthName) &&
-            getFormatedMonthName(maintenance?.monthName)}{' '}
-        </Typography.Text>
+        <div>
+          Maintenance Collection of{' '}
+          <Typography.Text
+            style={{ color: 'green', fontSize: '18px', marginLeft: '5px' }}
+            strong
+          >
+            {Boolean(maintenance?.monthName) &&
+              getFormatedMonthName(maintenance?.monthName)}{' '}
+          </Typography.Text>{' '}
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={fetchMaintenanceData}
+          ></Button>
+        </div>
       </h2>
 
       {loading ? (
