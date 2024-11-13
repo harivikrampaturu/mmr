@@ -211,12 +211,16 @@ const CollectionPage = () => {
                       {record?.flatNo || ''}
                     </Title>
                   }
-                  description={
-                    record?.comments ||
-                    (Boolean(record?.date) &&
-                      format(record?.date, 'yyyy-MM-dd')) ||
-                    'No Description'
-                  }
+                  description={`
+                    ${
+                      Boolean(record?.date)
+                        ? `${format(record?.date, 'yyyy-MM-dd')} \n ${
+                            Boolean(record?.comments)
+                              ? `| ${record?.comments} `
+                              : ''
+                          }`
+                        : 'No Description'
+                    }  `}
                 />
                 <div style={{ marginTop: 16 }}>
                   {record?.status === STATUS_INPROGRESS && (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react'; // Ensure firebase config is correct
+import { useState, useEffect, useCallback, useMemo } from 'react'; // Ensure firebase config is correct
 import axiosApi from '@/utils/axios';
 
 import {
@@ -21,19 +21,19 @@ import {
   PlusOutlined,
   ShareAltOutlined
 } from '@ant-design/icons';
-import { format } from 'date-fns';
 import MaintenanceMonthExpenses from './MonthExpenses';
 import MaintenanceDetails from './MaintenanceDetails';
-import {
-  PAYMENT_PAID,
-  PAYMENT_PARTIAL,
-  PAYMENT_PENDING,
-  STATUS_INPROGRESS
-} from '../constants';
+
 import Logout from '../common/components/Logout';
 import UpdateMonth from './UpdateMonth';
 import { startOfMonth, isBefore } from 'date-fns';
-import { getFormatedMonthName } from '@/utils/helpers';
+import {
+  getFormatedMonthName,
+  calculateTotalMaintenance,
+  calculateTotalExpenses,
+  handlePendingApprovals,
+  createBlobUrl
+} from '@/utils/helpers';
 
 const AdminPage = () => {
   const [months, setMonths] = useState([]);
@@ -44,7 +44,19 @@ const AdminPage = () => {
   const [form] = Form.useForm();
   const [downloadingMonth, setDownloadingMonth] = useState(null);
 
-  const downloadStatement = async (monthName) => {
+  const handleCopy = useCallback(() => {
+    if (selectedMonth) {
+      const docId = selectedMonth._id;
+      const url = `${window.location.origin}/collection?docId=${docId}`;
+
+      navigator.clipboard
+        .writeText(url)
+        .then(() => message.success('Link copied to clipboard!'))
+        .catch(() => message.error('Failed to copy link.'));
+    }
+  }, [selectedMonth]);
+
+  /*   const downloadStatement = async (monthName) => {
     try {
       setLoading(true);
       const response = await fetch(
@@ -66,59 +78,52 @@ const AdminPage = () => {
       console.error('Error downloading statement:', error);
       setLoading(false);
     }
-  };
+  }; */
 
-  const downloadExcel = async (monthName) => {
+  const downloadExcel = useCallback(async (monthName) => {
     try {
       setDownloadingMonth(monthName);
       const response = await axiosApi.get(
         `/api/maintenances/summary?monthName=${monthName}`,
-        {
-          responseType: 'blob' // Important to handle binary data
-        }
+        { responseType: 'blob' }
       );
-
-      // Create a URL for the blob and initiate a download
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
+      const { url, link } = createBlobUrl(new Blob([response.data]));
       link.setAttribute('download', `${monthName}-Maintenance-Statement.xlsx`);
       document.body.appendChild(link);
       link.click();
-
-      // Clean up the URL and link
-      link.parentNode.removeChild(link);
+      link.remove();
       window.URL.revokeObjectURL(url);
-      setDownloadingMonth(null);
     } catch (error) {
       console.error('Error downloading Excel file:', error);
-      alert('There was an issue downloading the file. Please try again.');
+      message.error('Error downloading the file. Please try again.');
+    } finally {
       setDownloadingMonth(null);
     }
-  };
+  }, []);
 
   // Fetch maintenance months data
-  const fetchMaintenanceMonths = async () => {
+  const fetchMaintenanceMonths = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axiosApi.get('/api/maintenances');
       setMonths(response?.data?.data.reverse());
     } catch (error) {
       console.error('Failed to fetch maintenance months:', error);
+      message.error('Error fetching maintenance months. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMaintenanceMonths();
-  }, []);
+  }, [fetchMaintenanceMonths]);
 
   // Create New Month
-  const handleCreateMonth = async () => {
+  const handleCreateMonth = useCallback(async () => {
     try {
       const values = await form.validateFields();
-      values.monthName = new Date(values.monthName).toISOString(); //format(values.monthName, 'MMMM yyyy');
+      values.monthName = new Date(values.monthName).toISOString();
       values.amount = Number(values.amount);
       values.partialAmount = Number(values.partialAmount);
       values.openingBalance = Number(values.openingBalance);
@@ -126,129 +131,91 @@ const AdminPage = () => {
       message.success('Maintenance month created successfully!');
       setModalVisible(false);
       form.resetFields();
-      fetchMaintenanceMonths(); // Refresh list
+      fetchMaintenanceMonths();
     } catch (error) {
       console.error('Failed to create maintenance month:', error);
-      message.error('Failed to create maintenance month.');
+      message.error('Failed to create maintenance month. Please try again.');
     }
-  };
+  }, [fetchMaintenanceMonths, form]);
 
-  const handleViewMonth = (record) => {
+  const handleViewMonth = useCallback((record) => {
     setSelectedMonth(record);
     setDrawerVisible(true);
-  };
+  }, []);
 
-  const calculateTotalMaintenance = (maintenanceData, amounts) => {
-    return maintenanceData.reduce((total, record) => {
-      if (record.payment === PAYMENT_PAID) return total + amounts.amount;
-      else if (record.payment === PAYMENT_PENDING) return total;
-      else if (record.payment === PAYMENT_PARTIAL)
-        return total + amounts.partial;
-      return total;
-    }, 0);
-  };
-
-  const calculateTotalExpenses = (expenses = []) => {
-    return expenses.reduce((total, expense) => total + expense.amount, 0);
-  };
-
-  const handlePendingApprovals = (maintenanceData) => {
-    return maintenanceData.reduce((total, maintenanceData) => {
-      return Boolean(maintenanceData.status === STATUS_INPROGRESS)
-        ? total + 1
-        : total;
-    }, 0);
-  };
-
-  const columns = [
-    {
-      title: 'Month Name',
-      dataIndex: 'monthName',
-      key: 'monthName',
-      ellipsis: true,
-      render: (text, record) => getFormatedMonthName(record.monthName)
-    },
-    {
-      title: 'Total Maintenance',
-      className: 'hidden md:table-cell',
-      render: (text, record) => (
-        <span>
-          {calculateTotalMaintenance(record?.maintenanceData, {
-            amount: record?.amount,
-            partial: record?.partialAmount
-          })}
-        </span>
-      )
-    },
-    {
-      title: 'Total Expenses',
-      className: 'hidden md:table-cell',
-      render: (text, record) => (
-        <span>{calculateTotalExpenses(record?.expenses)}</span>
-      )
-    },
-    {
-      title: 'Pending Approvals',
-      className: 'hidden md:table-cell',
-      render: (text, record) => (
-        <span>{handlePendingApprovals(record?.maintenanceData) || 0}</span>
-      )
-    },
-    {
-      title: 'Actions',
-      render: (text, record) => (
-        <div className='flex items-center'>
-          <Button
-            type='default'
-            onClick={() => {
-              downloadExcel(record.monthName);
-            }}
-            title='Download Excel'
-            icon={<FileExcelOutlined />}
-            size={'middle'}
-            loading={downloadingMonth === record.monthName}
-          />
-          <Button
-            type='default'
-            title='Download PDF'
-            onClick={() => {
-              downloadStatement(record.monthName);
-            }}
-            className='ml-2 mr-2 hidden'
-          >
-            <FilePdfOutlined />
-          </Button>
-          <Button
-            type='primary'
-            className='ml-2'
-            onClick={() => handleViewMonth(record)}
-          >
-            View
-          </Button>
-        </div>
-      )
-    }
-  ];
+  const columns = useMemo(
+    () => [
+      {
+        title: 'Month Name',
+        dataIndex: 'monthName',
+        key: 'monthName',
+        ellipsis: true,
+        render: (text, record) => getFormatedMonthName(record.monthName)
+      },
+      {
+        title: 'Total Maintenance',
+        className: 'hidden md:table-cell',
+        render: (text, record) => (
+          <span>
+            {calculateTotalMaintenance(record?.maintenanceData, {
+              amount: record?.amount,
+              partial: record?.partialAmount
+            })}
+          </span>
+        )
+      },
+      {
+        title: 'Total Expenses',
+        className: 'hidden md:table-cell',
+        render: (text, record) => (
+          <span>{calculateTotalExpenses(record?.expenses)}</span>
+        )
+      },
+      {
+        title: 'Pending Approvals',
+        className: 'hidden md:table-cell',
+        render: (text, record) => (
+          <span>{handlePendingApprovals(record?.maintenanceData) || 0}</span>
+        )
+      },
+      {
+        title: 'Actions',
+        render: (text, record) => (
+          <div className='flex items-center'>
+            <Button
+              type='default'
+              onClick={() => downloadExcel(record.monthName)}
+              title='Download Excel'
+              icon={<FileExcelOutlined />}
+              size='middle'
+              loading={downloadingMonth === record.monthName}
+            />
+            {/* <Button
+              type='default'
+              title='Download PDF'
+              onClick={() => downloadStatement(record.monthName)}
+              className='ml-2 mr-2 hidden'
+            >
+              <FilePdfOutlined />
+            </Button> */}
+            <Button
+              type='primary'
+              className='ml-2'
+              onClick={() => handleViewMonth(record)}
+            >
+              View
+            </Button>
+          </div>
+        )
+      }
+    ],
+    [downloadExcel, handleViewMonth, downloadingMonth]
+  );
 
   if (loading) return <Skeleton />;
 
-  const disabledDate = (current) => {
-    // Disable dates before the start of the current month
+  const disabledDate = () => (current) => {
     return current && isBefore(current.toDate(), startOfMonth(new Date()));
-  };
-
-  const handleCopy = () => {
-    const docId = selectedMonth._id; // Replace this with your dynamic docId if needed
-    const url = `${window.location.origin}/collection?docId=${docId}`;
-
-    navigator.clipboard
-      .writeText(url)
-      .then(() => {
-        message.success('Link copied to clipboard!');
-      })
-      .catch(() => {
-        message.error('Failed to copy link.');
-      });
   };
 
   return (
@@ -336,7 +303,7 @@ const AdminPage = () => {
               picker='month'
               format='MMMM YYYY'
               style={{ width: '100%' }}
-              disabledDate={disabledDate}
+              disabledDate={disabledDate()}
             />
           </Form.Item>
 
