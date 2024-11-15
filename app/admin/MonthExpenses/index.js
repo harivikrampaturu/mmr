@@ -73,16 +73,8 @@ const ExpenseManager = ({ maintenanceId, selectedMonth }) => {
     ...(selectedMonth?.expenses || [])
   ]);
   const [form] = Form.useForm();
-
-  /*   useEffect(() => {
-    const fetchExpenses = async () => {
-      const response = await fetch(`/api/maintenances/${maintenanceId}`);
-      const data = await response.json();
-      setExpenses(data.expenses);
-    };
-
-    fetchExpenses();
-  }, [maintenanceId]); */
+  const [isLoading, setIsLoading] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
 
   const ExpenseTable = ({ expenses, handleDeleteExpense }) => {
     const columns = [
@@ -113,7 +105,11 @@ const ExpenseManager = ({ maintenanceId, selectedMonth }) => {
         key: 'action',
         align: 'center',
         render: (_, record) => (
-          <Button danger onClick={() => handleDeleteExpense(record._id)}>
+          <Button
+            loading={Boolean(isLoading) && isLoading === record._id}
+            danger
+            onClick={() => handleDeleteExpense(record._id)}
+          >
             Delete
           </Button>
         )
@@ -132,7 +128,8 @@ const ExpenseManager = ({ maintenanceId, selectedMonth }) => {
   };
 
   const handleAddExpense = async (values) => {
-    // Convert the selected date to ISO string format
+    setIsAdding(true);
+    setTimeout(() => setIsAdding(false), 3000); // Convert the selected date to ISO string format
     values.expenseDate = values.expenseDate.toISOString();
     const updatedMaintenance = await addExpense(maintenanceId, values);
     if (updatedMaintenance) {
@@ -140,13 +137,16 @@ const ExpenseManager = ({ maintenanceId, selectedMonth }) => {
       form.resetFields();
       message.success('Expense added successfully');
     }
+    //  setIsAdding(false);
   };
 
   const handleDeleteExpense = async (expenseId) => {
+    setIsLoading(expenseId);
     await deleteExpense(maintenanceId, expenseId);
     const updatedExpenses = await fetch(`/api/maintenances/${maintenanceId}`);
     const data = await updatedExpenses.json();
     setExpenses(data.expenses);
+    setIsLoading(null);
   };
 
   return (
@@ -203,7 +203,12 @@ const ExpenseManager = ({ maintenanceId, selectedMonth }) => {
           </div>
           {/* Add Expense Button */}
           <Form.Item>
-            <Button type='primary' htmlType='submit' className='w-full'>
+            <Button
+              loading={isAdding}
+              type='primary'
+              htmlType='submit'
+              className='w-full'
+            >
               Add Expense
             </Button>
           </Form.Item>
