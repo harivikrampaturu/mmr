@@ -131,14 +131,25 @@ const AdminPage = () => {
   const handleCreateMonth = useCallback(async () => {
     try {
       const values = await form.validateFields();
-      values.monthName =
-        inputType === DATE_INPUT
-          ? new Date(values.monthName).toISOString()
-          : values.monthName;
+
+      // Handle date conversion based on input type
+      if (inputType === DATE_INPUT && values.monthName?.$d) {
+        // For DatePicker input, convert moment/dayjs object to ISO string
+        values.monthName = new Date(values.monthName.$d).toISOString();
+      } else if (inputType === TEXT_INPUT) {
+        // For text input, keep the original string value
+        values.monthName = values.monthName.trim();
+      }
+
+      // Convert numeric fields
       values.amount = Number(values.amount);
-      values.partialAmount = Number(values.partialAmount);
-      values.openingBalance = Number(values.openingBalance);
+      values.partialAmount = Number(values.partialAmount || 0);
+      values.openingBalance = Number(values.openingBalance || 0);
+
+      // Make API call
       await axiosApi.post('/api/maintenances', values);
+
+      // Success handling
       message.success('Maintenance month created successfully!');
       setModalVisible(false);
       form.resetFields();
@@ -147,7 +158,7 @@ const AdminPage = () => {
       console.error('Failed to create maintenance month:', error);
       message.error('Failed to create maintenance month. Please try again.');
     }
-  }, [fetchMaintenanceMonths, form]);
+  }, [fetchMaintenanceMonths, form, inputType]);
 
   const handleViewMonth = useCallback((record) => {
     setSelectedMonth(record);
