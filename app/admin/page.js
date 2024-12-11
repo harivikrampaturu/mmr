@@ -35,6 +35,9 @@ import {
   createBlobUrl
 } from '@/utils/helpers';
 
+const DATE_INPUT = 'date';
+const TEXT_INPUT = 'text';
+
 const AdminPage = () => {
   const [months, setMonths] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,6 +46,11 @@ const AdminPage = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [downloadingMonth, setDownloadingMonth] = useState(null);
+  const [inputType, setInputType] = useState(DATE_INPUT);
+
+  const disabledDate = (current) => {
+    return current && isBefore(current.toDate(), startOfMonth(new Date()));
+  };
 
   const handleCopy = useCallback(() => {
     if (selectedMonth) {
@@ -123,7 +131,10 @@ const AdminPage = () => {
   const handleCreateMonth = useCallback(async () => {
     try {
       const values = await form.validateFields();
-      values.monthName = new Date(values.monthName).toISOString();
+      values.monthName =
+        inputType === DATE_INPUT
+          ? new Date(values.monthName).toISOString()
+          : values.monthName;
       values.amount = Number(values.amount);
       values.partialAmount = Number(values.partialAmount);
       values.openingBalance = Number(values.openingBalance);
@@ -214,8 +225,8 @@ const AdminPage = () => {
 
   if (loading) return <Skeleton />;
 
-  const disabledDate = () => (current) => {
-    return current && isBefore(current.toDate(), startOfMonth(new Date()));
+  const toggleInputType = () => {
+    setInputType((prev) => (prev === DATE_INPUT ? TEXT_INPUT : DATE_INPUT));
   };
 
   return (
@@ -296,15 +307,26 @@ const AdminPage = () => {
         <Form form={form} layout='vertical'>
           <Form.Item
             name='monthName'
-            label='Month Name'
-            rules={[{ required: true, message: 'Please select the month' }]}
+            label={
+              <div className='flex items-center justify-between'>
+                <span>Month Name</span>
+                <Button type='link' onClick={toggleInputType}>
+                  Switch to {inputType === DATE_INPUT ? 'Text' : 'Date'} Input
+                </Button>
+              </div>
+            }
+            rules={[{ required: true, message: 'Please enter the month' }]}
           >
-            <DatePicker
-              picker='month'
-              format='MMMM YYYY'
-              style={{ width: '100%' }}
-              disabledDate={disabledDate()}
-            />
+            {inputType === DATE_INPUT ? (
+              <DatePicker
+                picker='month'
+                format='MMMM YYYY'
+                style={{ width: '100%' }}
+                disabledDate={disabledDate}
+              />
+            ) : (
+              <Input placeholder='Enter month name (e.g., January 2024)' />
+            )}
           </Form.Item>
 
           <Form.Item

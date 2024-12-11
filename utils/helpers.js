@@ -7,7 +7,21 @@ import {
 import { format } from 'date-fns';
 
 export const getFormatedMonthName = (month) => {
-  return format(month, 'MMMM yyyy');
+  // Check if it's a Date object
+  if (month instanceof Date) {
+    return format(month, 'MMMM yyyy');
+  }
+
+  // Check if it's an ISO format string
+  if (typeof month === 'string' && /^\d{4}-\d{2}-\d{2}/.test(month)) {
+    const parsedDate = new Date(month);
+    if (!isNaN(parsedDate.getTime())) {
+      return format(parsedDate, 'MMMM yyyy');
+    }
+  }
+
+  // Return the original input if it's not a Date or ISO format
+  return month;
 };
 
 export const calculateTotalMaintenance = (maintenanceData, amounts) => {
