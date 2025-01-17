@@ -27,6 +27,7 @@ const maintenanceSchema = new mongoose.Schema(
     openingBalance: Number,
     additionalIncome: Number,
     maintenanceData: [maintenanceDataSchema],
+    totalWaterAmount: Number,
     expenses: [expenseSchema]
   },
   { timeStamps: true }

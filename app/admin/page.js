@@ -363,6 +363,13 @@ const AdminPage = () => {
           <Form.Item name='openingBalance' label='Opening Balance'>
             <Input placeholder='Opening Balance' />
           </Form.Item>
+          <Form.Item
+            name='totalWaterAmount'
+            label='Total Water Amount'
+            rules={[{ required: true, message: 'Please enter the total water amount' }]}
+          >
+            <Input placeholder='Total Water Amount' />
+          </Form.Item>
         </Form>
       </Modal>
     </div>

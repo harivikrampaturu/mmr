@@ -1,5 +1,6 @@
 // components/MaintenanceData.js
-import React, { useState } from 'react';
+import React, { useState,
+  Tag } from 'react';
 import {
   List,
   Drawer,
@@ -122,6 +123,8 @@ const MaintenanceData = ({ id: docId, selectedMonth = {} }) => {
     console.log('selectedRecord Updated Values:', selectedRecord);
   };
 
+  const totalWaterAmount = maintenanceData.reduce((total, item) => total + (item.waterBill || 0), 0);
+
   return (
     <div>
       {waitingRecords.length > 0 && (
@@ -137,6 +140,11 @@ const MaintenanceData = ({ id: docId, selectedMonth = {} }) => {
           </Title>{' '}
         </>
       )}
+      <div className='text-right mb-4'>
+        <Typography.Title level={5}>Total Water Amount: ₹{totalWaterAmount}</Typography.Title>
+      </div>
+
+      {/* Maintenance Details Cards */}
       <List
         itemLayout='horizontal'
         dataSource={showWaiting ? waitingRecords : maintenanceData}

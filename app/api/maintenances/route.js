@@ -56,7 +56,8 @@ export async function POST(req) {
       amount,
       partialAmount,
       openingBalance = 0,
-      additionalIncome = 0
+      additionalIncome = 0,
+      totalWaterAmount = 0
     } = await req.json();
 
     // Check if a record with the same monthName already exists
@@ -76,14 +77,18 @@ export async function POST(req) {
       flat.waterBill = calculateWaterBill(flat.waterData);
     });
 
-    const newMaintenance = new Maintenance({
+    // Calculate water bill for each flat
+    maintenanceData.forEach(flat => {
+      flat.waterBill = (totalWaterAmount / maintenanceData.length) || 0;
+    });
       monthName,
       amount,
       openingBalance,
       additionalIncome,
       partialAmount,
       maintenanceData,
-      expenses: []
+      expenses: [],
+      totalWaterAmount
     });
 
     await newMaintenance.save();
@@ -139,11 +144,17 @@ export async function PUT(req) {
 
     let updatedData;
     if (type === 'MONTH_UPDATE') {
-      updatedData = await Maintenance.findByIdAndUpdate(
-        id,
-        updateData, // Only updating fields in `maintenanceSchema`
-        { new: true }
-      );
+      updatedData = await Maintenance.findById(id);
+      if (updatedData) {
+        Object.assign(updatedData, updateData);
+        if (updateData.totalWaterAmount !== undefined) {
+          const totalWaterAmount = updateData.totalWaterAmount;
+          updatedData.maintenanceData.forEach(flat => {
+            flat.waterBill = (totalWaterAmount / updatedData.maintenanceData.length) || 0;
+          });
+        }
+        await updatedData.save();
+      }
     } else if (type === MONTH_MAINTENANCE_DATA) {
       // Update maintenanceData
       // Update maintenanceData and recalculate water bills if waterData is updated
