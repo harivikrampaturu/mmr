@@ -98,11 +98,18 @@ export async function GET(request) {
         (sum, expense) => sum + (expense.amount || 0),
         0
       ) || 0;
+    // Calculate total water bill
+    const totalWaterBill = maintenance.maintenanceData.reduce(
+      (sum, entry) => sum + (entry.waterBill || 0),
+      0
+    );
+
     const overallTotal =
       maintenance.openingBalance +
       totalOccupiedAmount +
       totalPartialAmount +
-      additionalIncome -
+      additionalIncome +
+      totalWaterBill -
       expensesTotal;
 
     // Rows Data
@@ -123,6 +130,7 @@ export async function GET(request) {
         amount: totalPartialAmount
       },
       { sno: '4', description: 'Additional Income', amount: additionalIncome },
+      { sno: '5', description: 'Total Water Bill', amount: totalWaterBill },
       {
         sno: '',
         description: 'Total',
@@ -130,6 +138,7 @@ export async function GET(request) {
           totalOccupiedAmount +
           totalPartialAmount +
           additionalIncome +
+          totalWaterBill +
           maintenance.openingBalance
       }
     ];

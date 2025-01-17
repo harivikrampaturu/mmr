@@ -201,6 +201,13 @@ const AdminPage = () => {
         )
       },
       {
+        title: 'Water Bill',
+        className: 'hidden md:table-cell',
+        render: (text, record) => (
+          <span>{calculateWaterBill(record?.waterData)}</span>
+        )
+      },
+      {
         title: 'Actions',
         render: (text, record) => (
           <div className='flex items-center'>

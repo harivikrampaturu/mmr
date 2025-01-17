@@ -9,6 +9,13 @@ import dbConnect from '@/lib/dbConnect';
 import { authenticate } from '@/lib/middleware';
 import Maintenance from '@/models/Maintenance';
 
+const WATER_RATE = 10; // Example rate per unit of water
+
+// Function to calculate water bill
+const calculateWaterBill = (waterData) => {
+  return waterData * WATER_RATE;
+};
+
 /*  import { db } from '@/lib/firebase'; 
 import { collection, addDoc } from 'firebase/firestore'; */
 
@@ -26,7 +33,8 @@ const generateMaintenanceData = () => {
         status: STATUS_INITIAL,
         paymentMode: PAYMENT_MODE_CASH,
         residentName: '',
-        signature: ''
+        signature: '',
+        waterData: 0 // Placeholder for water data
       });
     }
   }
@@ -62,6 +70,11 @@ export async function POST(req) {
 
     // Generate maintenance data for 50 flats
     const maintenanceData = generateMaintenanceData();
+
+    // Calculate water bill for each flat
+    maintenanceData.forEach(flat => {
+      flat.waterBill = calculateWaterBill(flat.waterData);
+    });
 
     const newMaintenance = new Maintenance({
       monthName,
@@ -133,11 +146,15 @@ export async function PUT(req) {
       );
     } else if (type === MONTH_MAINTENANCE_DATA) {
       // Update maintenanceData
-      updatedData = await Maintenance.findByIdAndUpdate(
-        id,
-        { maintenanceData: updateData }, // Only updating maintenanceData
-        { new: true }
-      );
+      // Update maintenanceData and recalculate water bills if waterData is updated
+      updatedData = await Maintenance.findById(id);
+      if (updatedData) {
+        updatedData.maintenanceData = updateData;
+        updatedData.maintenanceData.forEach(flat => {
+          flat.waterBill = calculateWaterBill(flat.waterData);
+        });
+        await updatedData.save();
+      }
     } else if (type === MONTH_EXPENSES) {
       // Update expenses
       updatedData = await Maintenance.findByIdAndUpdate(

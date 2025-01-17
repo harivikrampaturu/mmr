@@ -199,6 +199,10 @@ const MaintenanceData = ({ id: docId, selectedMonth = {} }) => {
                   >
                     {item?.payment}
                   </Tag>
+                  <div>
+                    <Text strong>Water Bill: </Text>
+                    <Text>{item?.waterBill ? `₹${item.waterBill}` : 'N/A'}</Text>
+                  </div>
                 </div>
               }
             />
