@@ -8,7 +8,8 @@ const maintenanceDataSchema = new mongoose.Schema({
   date: String,
   status: String,
   paymentMode: String,
-  signature: String
+  signature: String,
+  waterBill: Number
 });
 
 const expenseSchema = new mongoose.Schema({

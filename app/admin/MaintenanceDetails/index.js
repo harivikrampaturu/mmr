@@ -144,80 +144,87 @@ const MaintenanceData = ({ id: docId, selectedMonth = {} }) => {
         <Typography.Title level={5}>Total Water Amount: ₹{totalWaterAmount}</Typography.Title>
       </div>
 
+      {/* Total Water Bill Amount */}
+      <div className='text-right mb-4'>
+        <Typography.Title level={5}>Total Water Bill: ₹{formData.reduce((total, item) => total + (item.waterBill || 0), 0)}</Typography.Title>
+      </div>
+
       {/* Maintenance Details Cards */}
-      <List
-        itemLayout='horizontal'
-        dataSource={showWaiting ? waitingRecords : maintenanceData}
-        renderItem={(item) => (
-          <List.Item
-            onClick={() => showDrawer(item)}
-            style={{
-              cursor: 'pointer',
-              padding: '16px',
-              borderRadius: '8px',
-              marginBottom: '10px',
-              transition: 'all 0.3s',
-              border: '1px solid #e0e0e0',
-              backgroundColor: '#f9f9f9',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#e6f7ff';
-              e.currentTarget.style.boxShadow =
-                '0px 4px 10px rgba(0, 0, 0, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#f9f9f9';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <List.Item.Meta
-              title={
-                <Text strong style={{ fontSize: '16px', color: '#202020' }}>
-                  Flat No: {item?.flatNo}
-                </Text>
-              }
-              description={
-                <div>
-                  {item?.status !== STATUS_INITIAL &&
-                    item?.status !== STATUS_APPROVED && (
-                      <Tag
-                        color={
-                          item?.status === STATUS_APPROVED
-                            ? 'green'
-                            : item?.status === STATUS_INPROGRESS
-                            ? 'orange'
-                            : 'lightgrey'
-                        }
-                      >
-                        Approval: {item?.status}
-                      </Tag>
-                    )}
-                  <Tag
-                    color={
-                      item?.payment === PAYMENT_PAID
-                        ? 'green'
-                        : item?.payment === PAYMENT_PARTIAL
-                        ? 'purple'
-                        : 'red'
-                    }
-                    style={{ textTransform: 'UPPERCASE' }}
-                  >
-                    {item?.payment}
-                  </Tag>
+      {formData.map(({ payment, flatNo, comments, _id, status, waterBill }, index) => (
+        <List
+          itemLayout='horizontal'
+          dataSource={showWaiting ? waitingRecords : maintenanceData}
+          renderItem={(item) => (
+            <List.Item
+              onClick={() => showDrawer(item)}
+              style={{
+                cursor: 'pointer',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '10px',
+                transition: 'all 0.3s',
+                border: '1px solid #e0e0e0',
+                backgroundColor: '#f9f9f9',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#e6f7ff';
+                e.currentTarget.style.boxShadow =
+                  '0px 4px 10px rgba(0, 0, 0, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#f9f9f9';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <List.Item.Meta
+                title={
+                  <Text strong style={{ fontSize: '16px', color: '#202020' }}>
+                    Flat No: {item?.flatNo}
+                  </Text>
+                }
+                description={
                   <div>
-                    <Text strong>Water Bill: </Text>
-                    <Text>{item?.waterBill ? `₹${item.waterBill}` : 'N/A'}</Text>
+                    {item?.status !== STATUS_INITIAL &&
+                      item?.status !== STATUS_APPROVED && (
+                        <Tag
+                          color={
+                            item?.status === STATUS_APPROVED
+                              ? 'green'
+                              : item?.status === STATUS_INPROGRESS
+                              ? 'orange'
+                              : 'lightgrey'
+                          }
+                        >
+                          Approval: {item?.status}
+                        </Tag>
+                      )}
+                    <Tag
+                      color={
+                        item?.payment === PAYMENT_PAID
+                          ? 'green'
+                          : item?.payment === PAYMENT_PARTIAL
+                          ? 'purple'
+                          : 'red'
+                      }
+                      style={{ textTransform: 'UPPERCASE' }}
+                    >
+                      {item?.payment}
+                    </Tag>
+                    <div>
+                      <Text strong>Water Bill: </Text>
+                      <Text>{item?.waterBill ? `₹${item.waterBill}` : 'N/A'}</Text>
+                    </div>
                   </div>
-                </div>
-              }
-            />
-            <RightOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
-          </List.Item>
-        )}
-      />
+                }
+              />
+              <RightOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </List.Item>
+          )}
+        />
+      ))}
 
       <Drawer
         title={`Flat No: ${selectedRecord?.flatNo}`}
