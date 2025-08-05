@@ -1,7 +1,6 @@
-// models/Expense.js
 import mongoose from 'mongoose';
 
-const ExpenseSchema = new mongoose.Schema(
+const YearlyExpenseSchema = new mongoose.Schema(
   {
     description: {
       type: String,
@@ -50,5 +49,5 @@ const ExpenseSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.models.Expense ||
-  mongoose.model('Expense', ExpenseSchema);
+export default mongoose.models.YearlyExpense ||
+  mongoose.model('YearlyExpense', YearlyExpenseSchema);
