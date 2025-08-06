@@ -250,31 +250,6 @@ export default function ExpensesPage() {
         )}
       </div>
 
-      {/* Summary */}
-      <div className="bg-blue-50 p-4 rounded-lg mb-6">
-        <h2 className="text-lg font-semibold mb-2">Summary</h2>
-        <p className="text-xl font-bold text-blue-600">
-          Total Expenses: ₹{totalExpenses}
-        </p>
-        <p className="text-gray-600">
-          Number of Expenses: {validExpenses.length}
-        </p>
-
-        {/* Category Breakdown */}
-        {Object.keys(expensesByCategory).length > 0 && (
-          <div className="mt-4">
-            <h3 className="font-semibold mb-2">By Category:</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {Object.entries(expensesByCategory).map(([category, amount]) => (
-                <div key={category} className="bg-white p-2 rounded">
-                  <span className="font-medium">{category}:</span> ₹{amount}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
       {/* Expenses Table */}
       <div className="overflow-x-auto">
         {validExpenses.length === 0 ? (
@@ -379,6 +354,86 @@ export default function ExpensesPage() {
               ))}
             </tbody>
           </table>
+        )}
+      </div>
+
+      {/* Summary */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg mt-6 mb-6 border border-blue-200">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+            <svg
+              className="w-5 h-5 mr-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              />
+            </svg>
+            Summary
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Total Expenses */}
+          <div className="bg-white p-3 rounded-md shadow-sm border border-blue-100">
+            <p className="text-xs font-medium text-gray-600 mb-1">Total</p>
+            <p className="text-xl font-bold text-blue-600">₹{totalExpenses}</p>
+          </div>
+
+          {/* Count */}
+          <div className="bg-white p-3 rounded-md shadow-sm border border-green-100">
+            <p className="text-xs font-medium text-gray-600 mb-1">Count</p>
+            <p className="text-xl font-bold text-green-600">
+              {validExpenses.length}
+            </p>
+          </div>
+
+          {/* Average */}
+          <div className="bg-white p-3 rounded-md shadow-sm border border-purple-100">
+            <p className="text-xs font-medium text-gray-600 mb-1">Average</p>
+            <p className="text-xl font-bold text-purple-600">
+              ₹
+              {validExpenses.length > 0
+                ? Math.round(totalExpenses / validExpenses.length)
+                : 0}
+            </p>
+          </div>
+
+          {/* Categories */}
+          <div className="bg-white p-3 rounded-md shadow-sm border border-orange-100">
+            <p className="text-xs font-medium text-gray-600 mb-1">Categories</p>
+            <p className="text-xl font-bold text-orange-600">
+              {Object.keys(expensesByCategory).length}
+            </p>
+          </div>
+        </div>
+
+        {/* Category Breakdown - Only if there are categories */}
+        {Object.keys(expensesByCategory).length > 0 && (
+          <div className="mt-4 pt-3 border-t border-gray-200">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              {Object.entries(expensesByCategory).map(([category, amount]) => (
+                <div
+                  key={category}
+                  className="bg-white p-2 rounded text-xs border border-gray-100"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-700 truncate">
+                      {category}
+                    </span>
+                    <span className="font-bold text-blue-600 ml-1">
+                      ₹{amount}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
