@@ -2,24 +2,32 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
-  const token = request.cookies.get('token');
   const { pathname } = request.nextUrl;
 
-  // Redirect to /login if user is not authenticated and trying to access /admin or its subpages
-  if (pathname.startsWith('/admin') && !token) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Allow only the home page (/) and static assets
+  if (
+    pathname === '/' ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/api/') ||
+    pathname.includes('.') || // Static files like .ico, .png, etc.
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next();
   }
 
-  // Redirect to /admin if the user is authenticated and trying to access the login page
-  if (pathname === '/login' && token) {
-    return NextResponse.redirect(new URL('/admin', request.url));
-  }
-
-  // Allow the request to continue if none of the conditions are met
-  return NextResponse.next();
+  // Redirect all other routes to home page
+  return NextResponse.redirect(new URL('/', request.url));
 }
 
-// Apply middleware only to /admin and its subpages
 export const config = {
-  matcher: ['/admin/:path*']
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)'
+  ]
 };

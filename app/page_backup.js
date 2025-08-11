@@ -1,4 +1,8 @@
-'use client';
+/**
+ * v0 by Vercel.
+ * @see https://v0.dev/t/GdWYqFo4TA7
+ * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
+ */
 
 export default function Component() {
   return (
@@ -8,20 +12,14 @@ export default function Component() {
         <section className="w-full h-[90vh] bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
           {/* Animated Background Elements */}
           <div className="absolute inset-0">
-            <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-            <div
-              className="absolute top-40 right-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
-              style={{ animationDelay: '2s' }}
-            ></div>
-            <div
-              className="absolute -bottom-8 left-40 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
-              style={{ animationDelay: '4s' }}
-            ></div>
+            <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+            <div className="absolute top-40 right-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-40 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
           </div>
 
           <div className="relative h-full w-full flex flex-col items-center justify-center text-white">
             <div className="text-center max-w-4xl mx-auto px-4">
-              {/*   {/* Logo/Brand */}
+              {/* Logo/Brand */}
               <div className="mb-8">
                 <div className="inline-flex items-center justify-center w-24 h-24 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
                   <svg
@@ -41,6 +39,9 @@ export default function Component() {
                 <h1 className="text-5xl md:text-7xl font-bold mb-4 text-shadow-lg bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
                   Matri Mirra Residency
                 </h1>
+                <p className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+                  A peaceful apartment at Shilpa layout, HMT Swarnapuri colony
+                </p>
               </div>
 
               {/* Main Message Card */}
@@ -115,14 +116,8 @@ export default function Component() {
               {/* Decorative Elements */}
               <div className="mt-12 flex justify-center space-x-4">
                 <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
-                <div
-                  className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"
-                  style={{ animationDelay: '0.3s' }}
-                ></div>
-                <div
-                  className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"
-                  style={{ animationDelay: '0.6s' }}
-                ></div>
+                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse animation-delay-300"></div>
+                <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse animation-delay-600"></div>
               </div>
             </div>
           </div>
@@ -141,6 +136,38 @@ export default function Component() {
           </p>
         </div>
       </footer>
+
+      <style jsx>{`
+        @keyframes blob {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+        .animation-delay-300 {
+          animation-delay: 0.3s;
+        }
+        .animation-delay-600 {
+          animation-delay: 0.6s;
+        }
+      `}</style>
     </div>
   );
 }
