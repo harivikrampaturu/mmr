@@ -1,128 +1,155 @@
-'use client';
-
 export default function Component() {
+  const currentYear = new Date().getFullYear();
+  const futureYears = [currentYear, currentYear + 1, currentYear + 2];
   return (
     <div className="flex flex-col min-h-[100dvh]">
       {/* Hero Section */}
       <main className="flex-1">
-        <section className="w-full h-[90vh] bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
-          {/* Animated Background Elements */}
-          <div className="absolute inset-0">
-            <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-            <div
-              className="absolute top-40 right-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
-              style={{ animationDelay: '2s' }}
-            ></div>
-            <div
-              className="absolute -bottom-8 left-40 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
-              style={{ animationDelay: '4s' }}
-            ></div>
-          </div>
-
+        <section className="w-full h-[90vh] bg-[url('/mmr_bg.png')] bg-cover bg-center relative">
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
           <div className="relative h-full w-full flex flex-col items-center justify-center text-white">
             <div className="text-center max-w-4xl mx-auto px-4">
-              {/*   {/* Logo/Brand */}
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 text-shadow-lg">
+                Matri Mirra Residency
+              </h1>
+              <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed">
+                Experience luxurious living in the heart of the city. Where
+                comfort, convenience, and community come together to create the
+                perfect living experience.
+              </p>
+
+              {/* Current Year Navigation */}
               <div className="mb-8">
-                <div className="inline-flex items-center justify-center w-24 h-24 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
-                  <svg
-                    className="w-12 h-12 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                <h2 className="text-2xl font-semibold mb-4">
+                  🎉 Current Festival Management
+                </h2>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a
+                    href="/2025/vinayaka-chavithi"
+                    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-xl transform hover:scale-105">
+                        <span className="mr-3 text-2xl">🕉️</span>
+                    <div className="text-left">
+                      <div className="text-lg">Vinayaka Chavithi</div>
+                      <div className="text-sm opacity-90">2025 Festival</div>
+                    </div>
+                    <span className="ml-4 text-xl">→</span>
+                  </a>
+
+                  <a
+                    href="/2025/expenses"
+                    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-xl transform hover:scale-105"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                    />
-                  </svg>
-                </div>
-                <h1 className="text-5xl md:text-7xl font-bold mb-4 text-shadow-lg bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                  Matri Mirra Residency
-                </h1>
-              </div>
-
-              {/* Main Message Card */}
-              <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl max-w-2xl mx-auto">
-                <div className="mb-6">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-500/20 rounded-full mb-4">
-                    <svg
-                      className="w-8 h-8 text-yellow-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                      />
-                    </svg>
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                    Access Restricted
-                  </h2>
-                  <p className="text-lg md:text-xl text-blue-100 leading-relaxed">
-                    Request the Admin{' '}
-                    <span className="font-semibold text-yellow-400">
-                      Vikram
-                    </span>{' '}
-                    to View the pages
-                  </p>
-                </div>
-
-                {/* Contact Information */}
-                <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                  <div className="flex items-center justify-center space-x-4 text-blue-100">
-                    <div className="flex items-center">
-                      <svg
-                        className="w-5 h-5 mr-2 text-yellow-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
-                      <span className="text-sm">Admin Access Required</span>
+                    <span className="mr-3 text-2xl">💰</span>
+                    <div className="text-left">
+                      <div className="text-lg">Festival Expenses</div>
+                      <div className="text-sm opacity-90">2025 Management</div>
                     </div>
-                    <div className="flex items-center">
-                      <svg
-                        className="w-5 h-5 mr-2 text-yellow-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <span className="ml-4 text-xl">→</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Future Events Section */}
+        <section className="py-16 bg-gradient-to-br from-gray-50 to-gray-100">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">
+                📅 Future Festival Planning
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Plan and manage upcoming festivals with our comprehensive
+                management system. Stay organized and ensure successful
+                celebrations for years to come.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {futureYears.map((year) => (
+                <div
+                  key={year}
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="p-6">
+                    <div className="text-center mb-4">
+                      <div className="text-4xl mb-2">🎊</div>
+                      <h3 className="text-2xl font-bold text-gray-800">
+                        {year}
+                      </h3>
+                      <p className="text-gray-600">Festival Season</p>
+                    </div>
+                    <div className="space-y-3">
+                      <a
+                        href={`/${year}/vinayaka-chavithi`}
+                        className="block w-full text-center py-3 px-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        />
-                      </svg>
-                      <span className="text-sm">Secure System</span>
+                        <span className="mr-2">🕉️</span>
+                        Vinayaka Chavithi
+                      </a>
+
+                      <a
+                        href={`/${year}/expenses`}
+                        className="block w-full text-center py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200"
+                      >
+                        <span className="mr-2">💰</span>
+                        Festival Expenses
+                      </a>
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-16 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">
+                ✨ Management Features
+              </h2>
+              <p className="text-xl text-gray-600">
+                Comprehensive tools for successful festival management
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center p-6">
+                <div className="text-4xl mb-4">👥</div>
+                <h3 className="text-xl font-semibold mb-2">
+                  Resident Management
+                </h3>
+                <p className="text-gray-600">
+                  Track devotees, families, and contributions
+                </p>
               </div>
 
-              {/* Decorative Elements */}
-              <div className="mt-12 flex justify-center space-x-4">
-                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
-                <div
-                  className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"
-                  style={{ animationDelay: '0.3s' }}
-                ></div>
-                <div
-                  className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"
-                  style={{ animationDelay: '0.6s' }}
-                ></div>
+              <div className="text-center p-6">
+                <div className="text-4xl mb-4">💰</div>
+                <h3 className="text-xl font-semibold mb-2">Expense Tracking</h3>
+                <p className="text-gray-600">
+                  Monitor all festival expenses and budgets
+                </p>
+              </div>
+
+              <div className="text-center p-6">
+                <div className="text-4xl mb-4">📊</div>
+                <h3 className="text-xl font-semibold mb-2">
+                  Analytics & Reports
+                </h3>
+                <p className="text-gray-600">Detailed summaries and insights</p>
+              </div>
+
+              <div className="text-center p-6">
+                <div className="text-4xl mb-4">🖨️</div>
+                <h3 className="text-xl font-semibold mb-2">Print & Export</h3>
+                <p className="text-gray-600">
+                  Generate reports and print lists
+                </p>
               </div>
             </div>
           </div>
@@ -130,15 +157,29 @@ export default function Component() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-sm text-gray-400">
-            &copy; 2024 Matri Mirra Residency. All rights reserved.
-          </p>
-          <p className="text-xs text-gray-500 mt-2">
-            This is a restricted access system. Contact administrator for
-            access.
-          </p>
+      <footer className="bg-gray-800 text-white py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <p className="text-sm">
+                &copy; 2024 Matri Mirra Residency. All rights reserved.
+              </p>
+            </div>
+            <div className="flex space-x-6 text-sm">
+              <a
+                href="/2025/vinayaka-chavithi"
+                className="hover:text-orange-400 transition-colors"
+              >
+                Current Festival
+              </a>
+              <a
+                href="/2025/expenses"
+                className="hover:text-green-400 transition-colors"
+              >
+                Expenses
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
